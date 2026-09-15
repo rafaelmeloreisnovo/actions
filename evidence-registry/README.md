@@ -1,27 +1,31 @@
 # Evidence Registry — AI Releases & Public Claims
 
-Evidence-first collector for public release pages, changelogs, documentation and other public claims.
+Collector documental para lançamentos, patches, revisões, previews, disponibilidade, deprecações e correções públicas de OpenAI, Anthropic/Claude, Google/Gemini e GitHub Copilot, com testemunhas secundárias de Bing/Yahoo.
 
-## Invariants
+## Invariantes
 
-SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM
+`SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM`
 
-- Preserve source URL and retrieval timestamp.
-- Store SHA-256 of retrieved body.
-- Preserve HTTP metadata when available.
-- Never infer a historical publication date from retrieval time.
-- Contradictions are recorded, not silently resolved.
-- Missing fields remain TOKEN_VAZIO.
-- Collection does not itself establish wrongdoing or any legal conclusion.
+- Bash + GitHub Actions; sem Python no coletor.
+- Preserva URL original, URL efetiva, timestamp UTC de coleta, headers HTTP e corpo bruto.
+- Calcula SHA-256 de cada corpo e do conjunto da execução.
+- `response_date` é horário da resposta HTTP, não data de publicação.
+- `last_modified` e `etag` são metadados de transporte/cache, não prova isolada de lançamento.
+- A data histórica declarada pela fonte fica em tabela separada; quando ausente = `TOKEN_VAZIO`.
+- Contradições e correções editoriais são preservadas, nunca apagadas.
+- `claim_allowed=false` por padrão: coleta documental não é conclusão jurídica.
 
-## Output
+## Estrutura
 
-Each run creates an append-only JSONL evidence ledger plus raw response bodies and a SHA256SUMS manifest.
+- `sources.tsv`: fontes públicas primárias, comunidades oficiais e testemunhas secundárias.
+- `collect.sh`: coleta HTTP, headers, corpos, SHA-256 e ledger JSONL.
+- `seed_events.tsv`: cronologia inicial verificada manualmente em fontes primárias.
+- `.github/workflows/evidence-registry.yml`: execução manual + diária, artifact e commit do ledger/manifests.
 
-## Usage
+## Execução local
 
 ```bash
-python3 evidence-registry/collector.py --sources evidence-registry/sources.txt --out evidence
+bash evidence-registry/collect.sh evidence-registry/sources.tsv evidence-artifact
 ```
 
-The source list is intentionally small at bootstrap. Expand only with public, relevant, attributable sources.
+Os corpos brutos ficam no artifact do GitHub Actions. O Git registra ledger e manifests para manter trilha documental sem transformar o repositório em depósito de centenas de GB.
