@@ -1,0 +1,4 @@
+# Bootstrap public sources. Keep source_date separate from retrieved_at.
+https://openai.com/index/gpt-5-4/
+https://help.openai.com/en/articles/9624314-model-release-notes
+https://openai.com/news/
