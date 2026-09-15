@@ -24,7 +24,7 @@ json_line() {
 
 while IFS=$'\t' read -r provider source_class url; do
   [[ -z "${provider:-}" ]] && continue
-  [[ "$provider" == #* ]] && continue
+  [[ "${provider:0:1}" == "#" ]] && continue
   [[ -z "${url:-}" ]] && continue
 
   retrieved="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
