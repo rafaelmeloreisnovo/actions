@@ -1,0 +1,43 @@
+provider	product	model	event_type	source_date	source_time	source_url	status	note
+Google	Gemini	Gemini 2.0 Flash	RELEASE/GA	2025-02-05	TOKEN_VAZIO	https://blog.google/technology/google-deepmind/gemini-model-updates-february-2025/	VERIFIED_PRIMARY	API/AI Studio/Vertex availability announced
+Anthropic	Claude	Claude 3.7 Sonnet	RELEASE	2025-02-24	TOKEN_VAZIO	https://www.anthropic.com/news/claude-3-7-sonnet	VERIFIED_PRIMARY	Claude Code also introduced as limited research preview
+OpenAI	GPT	GPT-4.5	RESEARCH_PREVIEW	2025-02-27	TOKEN_VAZIO	https://openai.com/index/introducing-gpt-4-5/	VERIFIED_PRIMARY	Launch post explicitly marks research preview
+GitHub	Copilot	Claude 3.7 / 3.5, o3-mini, Gemini 2.0 Flash	GA	2025-04-04	TOKEN_VAZIO	https://github.blog/changelog/2025-04-04-multiple-new-models-are-now-generally-available-in-github-copilot/	VERIFIED_PRIMARY	Models promoted from preview to GA in Copilot
+Anthropic	Claude	Claude Opus 4 + Sonnet 4	RELEASE	2025-05-22	TOKEN_VAZIO	https://www.anthropic.com/news/claude-4	VERIFIED_PRIMARY	Claude 4 generation introduced
+Google	Gemini	Gemini 2.5 Pro + Flash	GA	2025-06-17	TOKEN_VAZIO	https://blog.google/products/gemini/gemini-2-5-model-family-expands/	VERIFIED_PRIMARY	Flash-Lite introduced in preview
+Anthropic	Claude	Claude Opus 4.1	RELEASE	2025-08-05	TOKEN_VAZIO	https://www.anthropic.com/news/claude-opus-4-1	VERIFIED_PRIMARY	Upgrade to Opus 4
+OpenAI	GPT	GPT-5	RELEASE	2025-08-07	TOKEN_VAZIO	https://openai.com/index/introducing-gpt-5/	VERIFIED_PRIMARY	General ChatGPT launch
+OpenAI	API	GPT-5	API_RELEASE	2025-08-07	TOKEN_VAZIO	https://openai.com/index/introducing-gpt-5-for-developers/	VERIFIED_PRIMARY	API developer launch
+GitHub	Copilot	multiple models	DEPRECATION_NOTICE	2025-09-23	TOKEN_VAZIO	https://github.blog/changelog/2025-09-23-upcoming-deprecation-of-select-copilot-models-from-claude-openai-and-gemini/	VERIFIED_PRIMARY	Effective deprecation date announced as 2025-10-23
+Anthropic	Claude	Claude Sonnet 4.5	RELEASE	2025-09-29	TOKEN_VAZIO	https://www.anthropic.com/news/claude-sonnet-4-5	VERIFIED_PRIMARY	Model launch
+Anthropic	Claude Code	2.0 + checkpoints	UPDATE	2025-09-29	TOKEN_VAZIO	https://www.anthropic.com/news/enabling-claude-code-to-work-more-autonomously	VERIFIED_PRIMARY	Terminal 2.0, checkpoints, VS Code beta
+Anthropic	Claude	Claude Haiku 4.5	RELEASE	2025-10-15	TOKEN_VAZIO	https://www.anthropic.com/news/claude-haiku-4-5	VERIFIED_PRIMARY	Small model release
+GitHub	Copilot	multiple models	DEPRECATED	2025-10-23	TOKEN_VAZIO	https://github.blog/changelog/2025-10-23-selected-claude-openai-and-gemini-copilot-models-are-now-deprecated/	VERIFIED_PRIMARY	Effective retirement across Copilot experiences
+OpenAI	GPT	GPT-5.1 Instant + Thinking	RELEASE	2025-11-12	TOKEN_VAZIO	https://openai.com/index/gpt-5-1/	VERIFIED_PRIMARY	ChatGPT rollout
+OpenAI	API	GPT-5.1	API_RELEASE	2025-11-13	TOKEN_VAZIO	https://openai.com/index/gpt-5-1-for-developers/	VERIFIED_PRIMARY	API release
+Anthropic	Claude	Claude Opus 4.5	RELEASE	2025-11-24	TOKEN_VAZIO	https://www.anthropic.com/news/claude-opus-4-5	VERIFIED_PRIMARY	Apps/API/cloud availability
+OpenAI	GPT	GPT-5.2	RELEASE	2025-12-11	TOKEN_VAZIO	https://openai.com/index/introducing-gpt-5-2/	VERIFIED_PRIMARY	Frontier model series launch
+GitHub	Copilot	Claude Opus 4.1 / GPT-5 / GPT-5-Codex	DEPRECATION_NOTICE	2026-01-13	TOKEN_VAZIO	https://github.blog/changelog/2026-01-13-upcoming-deprecation-of-select-github-copilot-models-from-claude-and-openai/	VERIFIED_PRIMARY	Post later edited on 2026-02-19
+Anthropic	Claude	Claude Opus 4.6	RELEASE	2026-02-05	TOKEN_VAZIO	https://www.anthropic.com/news/claude-opus-4-6	VERIFIED_PRIMARY	1M context beta
+OpenAI	Codex	GPT-5.3-Codex	RELEASE	2026-02-05	TOKEN_VAZIO	https://openai.com/index/introducing-gpt-5-3-codex/	VERIFIED_PRIMARY	Agentic coding model
+OpenAI	Codex	GPT-5.3-Codex-Spark	RESEARCH_PREVIEW	2026-02-12	TOKEN_VAZIO	https://openai.com/index/introducing-gpt-5-3-codex-spark/	VERIFIED_PRIMARY	Realtime coding preview
+Anthropic	Claude	Claude Sonnet 4.6	RELEASE	2026-02-17	TOKEN_VAZIO	https://www.anthropic.com/news/claude-sonnet-4-6	VERIFIED_PRIMARY	Default for Free and Pro noted in source
+GitHub	Copilot	Claude Opus 4.1 / GPT-5 / GPT-5-Codex	DEPRECATED	2026-02-17	TOKEN_VAZIO	https://github.blog/changelog/2026-02-19-selected-anthropic-and-openai-models-are-now-deprecated/	VERIFIED_PRIMARY	Changelog posted 2026-02-19, effective date 2026-02-17
+OpenAI	GPT	GPT-5.4 Thinking + Pro	RELEASE	2026-03-05	TOKEN_VAZIO	https://openai.com/index/introducing-gpt-5-4/	VERIFIED_PRIMARY	ChatGPT/API/Codex
+OpenAI	GPT	GPT-5.5	RELEASE	2026-04-23	TOKEN_VAZIO	https://openai.com/index/introducing-gpt-5-5/	VERIFIED_PRIMARY	Launch; API availability updated 2026-04-24
+GitHub	Copilot Cloud Agent	Claude Haiku 4.5 + GPT-5.4-mini	MODEL_AVAILABILITY	2026-05-18	TOKEN_VAZIO	https://github.blog/changelog/2026-05-18-copilot-cloud-agent-fast-cost-efficient-models-for-simple-tasks/	VERIFIED_PRIMARY	New selectable models
+GitHub	Copilot Web	model selection	UPDATE	2026-05-20	TOKEN_VAZIO	https://github.blog/changelog/2026-05-20-updates-to-available-models-in-copilot-on-web/	VERIFIED_PRIMARY	All Gemini models removed from web model picker at that time
+OpenAI	GPT	GPT-5.5 Instant	PATCH/UPDATE	2026-05-28	TOKEN_VAZIO	https://help.openai.com/en/articles/9624314-model-release-notes	VERIFIED_PRIMARY	Style/quality update
+OpenAI	ChatGPT	o3 + GPT-4.5	RETIREMENT_NOTICE	2026-05-28	TOKEN_VAZIO	https://help.openai.com/en/articles/9624314-model-release-notes	VERIFIED_PRIMARY	Future retirement dates announced
+Anthropic	Claude	Claude Opus 4.8	RELEASE	2026-05-28	TOKEN_VAZIO	https://www.anthropic.com/news/claude-opus-4-8	VERIFIED_PRIMARY	Upgrade release
+GitHub	Copilot	Gemini 3.1 Pro + 3.5 Flash	MODEL_AVAILABILITY	2026-06-02	TOKEN_VAZIO	https://github.blog/changelog/2026-06-02-gemini-models-in-copilot-cli-cloud-agent-and-the-copilot-app/	VERIFIED_PRIMARY	CLI/cloud agent/app/SDK surfaces
+Anthropic	Claude	Fable 5 + Mythos 5	RELEASE	2026-06-09	TOKEN_VAZIO	https://www.anthropic.com/news/claude-fable-5-mythos-5	VERIFIED_PRIMARY	Article includes later suspension/redeployment updates
+Anthropic	Claude	Fable 5 + Mythos 5	SUSPENDED	2026-06-12	TOKEN_VAZIO	https://www.anthropic.com/news/claude-fable-5-mythos-5	VERIFIED_PRIMARY	Access suspension recorded in update
+Anthropic	Claude	Claude Sonnet 5	RELEASE	2026-06-30	TOKEN_VAZIO	https://www.anthropic.com/news/claude-sonnet-5	VERIFIED_PRIMARY	Sonnet generation launch
+Anthropic	Claude	Fable 5 + Mythos 5	REDEPLOYED	2026-07-01	TOKEN_VAZIO	https://www.anthropic.com/news/claude-fable-5-mythos-5	VERIFIED_PRIMARY	Availability restored
+OpenAI	GPT	GPT-5.6	RELEASE	2026-07-09	TOKEN_VAZIO	https://openai.com/index/gpt-5-6/	VERIFIED_PRIMARY	Frontier family launch
+Anthropic	Claude	Claude Opus 5	RELEASE	2026-07-24	TOKEN_VAZIO	https://www.anthropic.com/news/claude-opus-5	VERIFIED_PRIMARY	Opus generation launch
+GitHub	Copilot	Gemini 2.5 Pro + Gemini 3 Flash	DEPRECATED	2026-07-31	TOKEN_VAZIO	https://github.blog/changelog/2026-07-31-gemini-2-5-pro-and-gemini-3-flash-deprecated/	VERIFIED_PRIMARY	Deprecated across Copilot
+GitHub	Copilot	multiple models	DEPRECATION_NOTICE	2026-07-31	TOKEN_VAZIO	https://github.blog/changelog/2026-07-31-upcoming-august-2026-model-deprecations-in-github-copilot/	VERIFIED_PRIMARY	Effective date 2026-09-01
+GitHub	Copilot	multiple models	DEPRECATED	2026-09-01	TOKEN_VAZIO	https://github.blog/changelog/2026-08-31-selected-github-copilot-models-deprecated/	VERIFIED_PRIMARY	Article published 2026-08-31; effective date next day
+GitHub	Copilot	Claude Fable 5.1 + Gemini 3.8 Flash	MODEL_AVAILABILITY	2026-09-04	TOKEN_VAZIO	https://github.blog/changelog/2026-09-04-github-copilot-weekly-releases-august-31/	VERIFIED_PRIMARY	Weekly release note
