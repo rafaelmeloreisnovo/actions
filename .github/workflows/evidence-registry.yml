@@ -2,6 +2,11 @@ name: Evidence Registry
 
 on:
   workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'evidence-registry/**'
+      - '.github/workflows/evidence-registry.yml'
   schedule:
     - cron: '17 6 * * *'
 
