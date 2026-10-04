@@ -1,0 +1,132 @@
+name: ci-kernel4-freestanding
+
+on:
+  pull_request:
+    paths:
+      - 'freestanding/kernel4/**'
+      - '.github/workflows/ci-kernel4-freestanding.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'freestanding/kernel4/**'
+      - '.github/workflows/ci-kernel4-freestanding.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  freestanding:
+    name: kernel4 / ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: x86_64
+            target: x86_64-unknown-none-elf
+            arch_flags: ''
+          - name: armv7
+            target: armv7-none-eabi
+            arch_flags: '-march=armv7-a -mfloat-abi=soft'
+          - name: aarch64
+            target: aarch64-none-elf
+            arch_flags: '-march=armv8-a'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build freestanding ELF
+        env:
+          TARGET: ${{ matrix.target }}
+          ARCH_FLAGS: ${{ matrix.arch_flags }}
+          OUT: out/kernel4/${{ matrix.name }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$OUT"
+
+          clang \
+            --target="$TARGET" \
+            $ARCH_FLAGS \
+            -std=c11 \
+            -Os \
+            -ffreestanding \
+            -fno-builtin \
+            -fno-stack-protector \
+            -fdata-sections \
+            -ffunction-sections \
+            -Wall -Wextra -Werror \
+            -c freestanding/kernel4/kernel4.c \
+            -o "$OUT/kernel4.o"
+
+          ld.lld \
+            -T freestanding/kernel4/kernel4.ld \
+            -o "$OUT/kernel4.elf" \
+            "$OUT/kernel4.o"
+
+      - name: Verify freestanding contract
+        env:
+          OUT: out/kernel4/${{ matrix.name }}
+        run: |
+          set -euo pipefail
+          ELF="$OUT/kernel4.elf"
+          RECEIPT="$OUT/receipt.txt"
+
+          {
+            echo 'KERNEL4_FREESTANDING_RECEIPT_V1'
+            echo "target=${{ matrix.target }}"
+            echo "arch=${{ matrix.name }}"
+            echo
+            readelf -h "$ELF"
+            echo
+            readelf -l "$ELF"
+            echo
+            readelf -d "$ELF"
+            echo
+            readelf -r "$ELF"
+            echo
+            readelf -s "$ELF"
+            echo
+            sha256sum "$ELF"
+          } | tee "$RECEIPT"
+
+          test "$(readelf -h "$ELF" | awk '/Type:/ { print $2; exit }')" = 'EXEC'
+
+          if readelf -d "$ELF" 2>&1 | grep -q 'NEEDED'; then
+            echo 'FAIL: dynamic dependency (NEEDED) found' >&2
+            exit 1
+          fi
+
+          if readelf -l "$ELF" | grep -q 'INTERP'; then
+            echo 'FAIL: program interpreter found' >&2
+            exit 1
+          fi
+
+          if nm -u "$ELF" | grep -q .; then
+            echo 'FAIL: undefined external symbol found' >&2
+            nm -u "$ELF" >&2
+            exit 1
+          fi
+
+          if readelf -r "$ELF" | grep -q '^Relocation section'; then
+            echo 'FAIL: runtime relocations found' >&2
+            exit 1
+          fi
+
+          {
+            echo
+            echo 'gate=PASS'
+            echo 'needed=NONE'
+            echo 'interp=NONE'
+            echo 'undefined=NONE'
+            echo 'relocations=NONE'
+          } | tee -a "$RECEIPT"
+
+      - name: Upload exact evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: kernel4-${{ matrix.name }}-receipt
+          path: |
+            out/kernel4/${{ matrix.name }}/kernel4.elf
+            out/kernel4/${{ matrix.name }}/receipt.txt
+          if-no-files-found: error
