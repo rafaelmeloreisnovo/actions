@@ -65,6 +65,7 @@ build_one() {
         -ffreestanding \
         -fno-builtin \
         -fno-stack-protector \
+        -fomit-frame-pointer \
         -fno-pic \
         -fno-pie \
         -fno-unwind-tables \
@@ -201,6 +202,7 @@ LINKER_SHA256=$("$SHA256_BIN" freestanding/kernel4/kernel4.ld | awk '{print $1}'
     echo "elf_sha256_a=$ELF_SHA_A"
     echo "elf_sha256_b=$ELF_SHA_B"
     echo 'reproducible_bit_for_bit=true'
+    echo 'frame_pointer=OMITTED'
     echo 'needed=NONE'
     echo 'interp=NONE'
     echo 'undefined=NONE'
