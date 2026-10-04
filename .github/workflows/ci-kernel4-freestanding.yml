@@ -36,6 +36,17 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Resolve LLD linker
+        run: |
+          set -euo pipefail
+          if ! command -v ld.lld >/dev/null 2>&1; then
+            sudo apt-get update
+            sudo apt-get install -y --no-install-recommends lld
+          fi
+          clang --version
+          ld.lld --version
+          readelf --version | head -n 1
+
       - name: Build freestanding ELF
         env:
           TARGET: ${{ matrix.target }}
@@ -76,6 +87,8 @@ jobs:
             echo 'KERNEL4_FREESTANDING_RECEIPT_V1'
             echo "target=${{ matrix.target }}"
             echo "arch=${{ matrix.name }}"
+            echo "clang=$(clang --version | head -n 1)"
+            echo "lld=$(ld.lld --version | head -n 1)"
             echo
             readelf -h "$ELF"
             echo
