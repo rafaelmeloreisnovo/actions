@@ -1,6 +1,6 @@
 # Kernel4 freestanding core
 
-Status is determined only by exact-head CI evidence. `IMPLEMENTED_UNTESTED != PASS`.
+Status is determined only by source-bound CI evidence. `IMPLEMENTED_UNTESTED != PASS` and `CI_PASS != PHYSICAL_PASS`.
 
 ## Intent
 
@@ -15,9 +15,9 @@ as a minimal freestanding core that is independent of the inherited Gradle/Node 
 ## Provenance boundary
 
 - `SOURCE`: the user-supplied `(4bit|4bit)` frame structure.
-- `ARTIFACT`: `kernel4.c` + `kernel4.ld` + CI receipt.
-- `EXECUTION`: Clang/LLD cross-linking performed by GitHub Actions.
-- `EVIDENCE`: ELF headers/symbol table/relocations + SHA-256 receipt.
+- `ARTIFACT`: `kernel4.c` + `kernel4.ld` + `ci_gate.sh` + CI receipt.
+- `EXECUTION`: exact-source Clang/LLD cross-linking performed by GitHub Actions.
+- `EVIDENCE`: ELF identity, entrypoint, sections, segments, stack use, size, two-build reproducibility and SHA-256 receipt.
 - `CLAIM`: only the local Kernel4 delta is RAFAELIA-authored. Inherited Gradle Actions content remains third-party under `THIRD_PARTY_PROVENANCE.md`.
 
 The inner emoji/glyph sequence has **no assigned machine opcode in this version**. Its operational mapping is `TOKEN_VAZIO`, deliberately preventing symbolic interpretation from being presented as implemented behavior.
@@ -47,6 +47,8 @@ The core must compile/link with:
 - `-ffreestanding`
 - `-fno-builtin`
 - `-fno-stack-protector`
+- `-fno-pic -fno-pie`
+- unwind tables disabled
 - `-nostdlib` by construction at link time (direct `ld.lld`)
 - no libc
 - no heap
@@ -55,12 +57,18 @@ The core must compile/link with:
 - no dynamic loader
 - no dynamic dependencies
 - no undefined external symbols
+- no runtime relocations
+- no writable+executable load segment
+- no executable stack
+- no stack use before a stack bootstrap exists
 
 The CI builds three independent ELF images:
 
 1. `x86_64-unknown-none-elf`
 2. `armv7-none-eabi`
 3. `aarch64-none-elf`
+
+The `x86_64` profile also disables the red zone. ARM profiles remain architecture-generic; hardware-specific performance tuning is not promoted until physical-device receipts exist.
 
 ## Kernel shape
 
@@ -75,17 +83,43 @@ validity     M8 = one presence bit per row
 
 `P2` is metadata calculated from a known frame; it does not expand `V8` into a 10-bit address space. `M8` is evidence metadata that keeps unknown rows distinct from a known zero frame.
 
-## CI gate
+## Critical CI gate V2
 
-A target passes the freestanding gate only when all checks hold for the exact ELF produced:
+`freestanding/kernel4/ci_gate.sh` is the local, reproducible gate used by CI and can also be invoked outside GitHub Actions when the same toolchain is available.
+
+A target passes only when all checks hold:
 
 ```text
-ELF type     = EXEC
-NEEDED       = NONE
-INTERP       = NONE
-UNDEFINED    = NONE
-RELOCATIONS  = NONE
-SHA256       = RECORDED
+source SHA            = expected source SHA
+ELF class/machine     = expected architecture
+ELF type              = EXEC
+entrypoint             = kernel4_entry
+NEEDED                 = NONE
+INTERP                 = NONE
+UNDEFINED              = NONE
+runtime relocations    = NONE
+runtime-oriented sect. = NONE
+W+X LOAD segment       = NONE
+executable stack       = NONE
+max stack bytes        = 0
+allocated image        <= 4096 bytes
+build A == build B     = byte-for-byte identical
+SHA-256                = RECORDED
 ```
 
-No CI result promotes physical execution, glyph semantics, or the hosted Gradle/Node action into a freestanding claim.
+The 4096-byte allocation ceiling is a deliberate critical-core ratchet. Increasing it requires an explicit contract change rather than silent growth.
+
+## Friction and supply-chain controls
+
+The lane now:
+
+- uses a fixed `ubuntu-24.04` runner contract instead of `ubuntu-latest` drift;
+- resolves the already installed versioned LLD (`ld.lld-18` when needed) and **does not run `apt-get`**;
+- checks out only the Kernel4 subtree;
+- checks the PR source head explicitly and records source/event/base SHAs separately;
+- pins external GitHub actions by immutable commit SHA;
+- cancels obsolete runs from the same PR/ref;
+- stores 30-day evidence artifacts with no compression overhead for these tiny files;
+- emits a compact job summary plus a machine-friendly key/value receipt.
+
+No CI result promotes physical ARM32/ARM64 execution, hardware performance, glyph semantics, or the hosted Gradle/Node action into a freestanding claim. Those remain separate evidence gates.
