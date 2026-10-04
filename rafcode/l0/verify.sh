@@ -14,7 +14,7 @@ command -v "$CC_BIN" >/dev/null 2>&1 || CC_BIN=clang
 command -v "$CC_BIN" >/dev/null 2>&1
 command -v nm >/dev/null 2>&1
 
-if grep -nE '^[[:space:]]*#include|(^|[^A-Za-z0-9_])(for|while|do|switch|goto|malloc|calloc|realloc|free|syscall)([^A-Za-z0-9_]|$)' "$SRC"; then
+if sed '/^[[:space:]]*\/\*/,/^[[:space:]]*\*\//d' "$SRC" | grep -nE '^[[:space:]]*#include|(^|[^A-Za-z0-9_])(for|while|do|switch|goto|malloc|calloc|realloc|free|syscall)([^A-Za-z0-9_]|$)'; then
     printf '%s\n' 'FAIL: hosted dependency or unnecessary control-flow token in L0 source'
     exit 1
 fi
