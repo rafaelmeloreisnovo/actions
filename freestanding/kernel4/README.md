@@ -1,6 +1,6 @@
 # Kernel4 freestanding core
 
-Status: `IMPLEMENTED_UNTESTED` until the repository CI for the exact commit is green.
+Status is determined only by exact-head CI evidence. `IMPLEMENTED_UNTESTED != PASS`.
 
 ## Intent
 
@@ -21,6 +21,24 @@ as a minimal freestanding core that is independent of the inherited Gradle/Node 
 - `CLAIM`: only the local Kernel4 delta is RAFAELIA-authored. Inherited Gradle Actions content remains third-party under `THIRD_PARTY_PROVENANCE.md`.
 
 The inner emoji/glyph sequence has **no assigned machine opcode in this version**. Its operational mapping is `TOKEN_VAZIO`, deliberately preventing symbolic interpretation from being presented as implemented behavior.
+
+### `TOKEN_VAZIO != 0`
+
+Unknown/unauthorized glyph payloads are represented by **absence of a value**, not by assigning the numeric value zero:
+
+```text
+cell.present = 0  => payload absent / ignore cell.value
+cell.present = 1  => cell.value is an authorized 8-bit frame
+```
+
+Therefore these states are distinct:
+
+```text
+TOKEN_VAZIO        => present=0, no semantic numeric value
+known frame 0x00   => present=1, value=0x00
+```
+
+The eight current glyph rows are structurally present but their machine payloads remain absent until an explicit opcode authority is defined.
 
 ## Contract
 
@@ -51,10 +69,11 @@ high nibble  H4 = bits 7..4
 low nibble   L4 = bits 3..0
 frame        V8 = H4 || L4
 parity       P2 = parity(H4) || parity(L4)
-rows         R8 = 8 structural frames
+rows         R8 = 8 structural cells
+validity     M8 = one presence bit per row
 ```
 
-`P2` is metadata calculated from a frame; it does not expand `V8` into a 10-bit address space.
+`P2` is metadata calculated from a known frame; it does not expand `V8` into a 10-bit address space. `M8` is evidence metadata that keeps unknown rows distinct from a known zero frame.
 
 ## CI gate
 
@@ -69,4 +88,4 @@ RELOCATIONS  = NONE
 SHA256       = RECORDED
 ```
 
-`IMPLEMENTED_UNTESTED != PASS`.
+No CI result promotes physical execution, glyph semantics, or the hosted Gradle/Node action into a freestanding claim.
