@@ -1,0 +1,103 @@
+name: ci-kernel4-freestanding
+
+on:
+  pull_request:
+    paths:
+      - 'freestanding/kernel4/**'
+      - '.github/workflows/ci-kernel4-freestanding.yml'
+  push:
+    branches: [ main ]
+    paths:
+      - 'freestanding/kernel4/**'
+      - '.github/workflows/ci-kernel4-freestanding.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kernel4-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  freestanding:
+    name: kernel4 / ${{ matrix.name }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: x86_64
+            target: x86_64-unknown-none-elf
+            arch_flags: '-mno-red-zone'
+            elf_class: ELF64
+            elf_machine: 'Advanced Micro Devices X86-64'
+          - name: armv7
+            target: armv7-none-eabi
+            arch_flags: '-march=armv7-a -mfloat-abi=soft'
+            elf_class: ELF32
+            elf_machine: ARM
+          - name: aarch64
+            target: aarch64-none-elf
+            arch_flags: '-march=armv8-a'
+            elf_class: ELF64
+            elf_machine: AArch64
+
+    steps:
+      - name: Checkout exact source head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+          sparse-checkout: |
+            freestanding/kernel4
+          sparse-checkout-cone-mode: true
+
+      - name: Critical freestanding gate
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+          EVENT_SHA: ${{ github.sha }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha || '' }}
+          MAX_ALLOC_BYTES: '4096'
+          OUT: out/kernel4/${{ matrix.name }}
+          ARCH_FLAGS: ${{ matrix.arch_flags }}
+        run: |
+          bash freestanding/kernel4/ci_gate.sh \
+            '${{ matrix.name }}' \
+            '${{ matrix.target }}' \
+            '${{ matrix.elf_class }}' \
+            '${{ matrix.elf_machine }}' \
+            "$ARCH_FLAGS" \
+            "$OUT"
+
+      - name: Publish gate summary
+        if: always()
+        env:
+          OUT: out/kernel4/${{ matrix.name }}
+        run: |
+          {
+            echo '### Kernel4 / ${{ matrix.name }}'
+            echo
+            if [[ -f "$OUT/receipt.txt" ]]; then
+              echo '```text'
+              sed -n '1,34p' "$OUT/receipt.txt"
+              echo '```'
+            else
+              echo 'Receipt not produced: gate failed before evidence closure.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload exact evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: kernel4-${{ matrix.name }}-receipt
+          path: |
+            out/kernel4/${{ matrix.name }}/kernel4.elf
+            out/kernel4/${{ matrix.name }}/receipt.txt
+            out/kernel4/${{ matrix.name }}/stack-usage.txt
+          if-no-files-found: warn
+          compression-level: 0
+          retention-days: 30
