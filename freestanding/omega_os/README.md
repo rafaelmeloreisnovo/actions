@@ -42,11 +42,15 @@ Slot transitions:
 - READY/RUNNING/WAITING -> FAULTED via privileged FAULT
 - STOPPED/FAULTED -> EMPTY via privileged REAP (capability erased)
 
-Capability grant is limited to RUN=1, CONTROL=2, EXIT=4. Capability changes
+Capability grant is limited to RUN=1, CONTROL=2, EXIT=4. Every targeted
+event contains the task epoch, except BOOT/SCHEDULE/SHUTDOWN (epoch zero). Capability changes
 require a fresh spawn after REAP. It does not implement secure tokens, actual
 CPU privilege separation, sandboxing, memory protection or trusted identities.
-No PID reuse protection across lifetimes yet: tasks IDs 1..8 are recycled;
-external callers MUST prevent stale actor handles (typed gap).
+Each slot now retains a monotonically increasing generation (epoch) across
+REAP and requires exact epoch on targeted events. A new SPAWN must supply
+previous_epoch+1; overflow blocks further reuse. This rejects old-lifetime
+events but does NOT cryptographically authenticate an actor: caller must
+still provide trusted identity/epoch handles and serialize event delivery.
 
 Accepted event sequence starts at 1, is strictly monotonic; overflow blocks
 all changes. An invalid event is rejected atomically (no state mutation),
@@ -90,7 +94,8 @@ OS release. Exact copyright/license grant of this local delta: TOKEN_VAZIO.
 
 P1 — MACHINE PROOF: exhaustive legal transitions and rejected transitions;
 source-bound executable CI; deterministic replay; independent reviewer;
-race-free external event serialization; repair stale-handle/identity model.
+race-free event serialization; independently falsify epoch reuse and trusted
+identity binding. Epoch-source fix is IMPLEMENTED_UNTESTED until CI.
 
 P2 — COMPUTE: caller-owned task code, safe CPU context bootstrap, trap/IRQ
 delivery, preemption with explicit state transitions, bounded queues,
