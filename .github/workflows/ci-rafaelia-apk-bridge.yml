@@ -1,0 +1,93 @@
+name: RAFAELIA APK Bridge / Freestanding L0
+
+on:
+  pull_request:
+    paths:
+      - 'freestanding/apk_bridge/**'
+      - '.github/workflows/ci-rafaelia-apk-bridge.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freestanding/apk_bridge/**'
+      - '.github/workflows/ci-rafaelia-apk-bridge.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: apk-bridge-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  freestanding-objects:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {arch: x86_64, target: x86_64-unknown-none-elf, flags: '-mno-red-zone'}
+          - {arch: armv7, target: armv7-none-eabi, flags: '-march=armv7-a -mfloat-abi=soft'}
+          - {arch: aarch64, target: aarch64-none-elf, flags: '-march=armv8-a'}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # pinned
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Compile isolated L0 and check undefined symbols
+        env:
+          TARGET: ${{ matrix.target }}
+          FLAGS: ${{ matrix.flags }}
+          EXPECTED: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          read -r -a EXTRA <<< "$FLAGS"
+          mkdir -p out/apk-bridge
+          for unit in apk_probe boot_vm; do
+            clang --target="$TARGET" "${EXTRA[@]}" -std=c11 -O2 \
+              -ffreestanding -fno-builtin -fno-stack-protector \
+              -fno-unwind-tables -fno-asynchronous-unwind-tables \
+              -Wall -Wextra -Werror -c "freestanding/apk_bridge/${unit}.c" \
+              -o "out/apk-bridge/${unit}.o"
+            test -z "$(nm -u "out/apk-bridge/${unit}.o")"
+          done
+          {
+            echo 'RAFAELIA_APK_BRIDGE_OBJECT_RECEIPT_V1'
+            echo "source_sha=$EXPECTED"
+            echo "arch=${{ matrix.arch }}"
+            echo 'scope=OBJECT_ONLY_NOT_HARDWARE_OR_APK_BUILD'
+            echo 'undefined_symbols=NONE'
+            sha256sum out/apk-bridge/*.o
+          } > out/apk-bridge/receipt.txt
+          cat out/apk-bridge/receipt.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # pinned
+        with:
+          name: apk-bridge-${{ matrix.arch }}-receipt
+          path: out/apk-bridge/
+          if-no-files-found: error
+          retention-days: 30
+  adversarial-host:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # pinned
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Synthetic adversarial test suite and shell syntax
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n freestanding/apk_bridge/host/build_debug.sh
+          clang -std=c11 -O2 -fPIC -shared -ffreestanding -fno-builtin \
+            -Wall -Wextra -Werror \
+            freestanding/apk_bridge/apk_probe.c freestanding/apk_bridge/boot_vm.c \
+            -o freestanding/apk_bridge/libra_bridge.so
+          RA_BRIDGE_TEST_LIB=freestanding/apk_bridge/libra_bridge.so \
+            python3 -m unittest discover -s freestanding/apk_bridge/tests -v
+          echo 'Synthetic host tests; no APK build, Android runtime or physical boot'
