@@ -10,7 +10,7 @@ Authority and boundary:
 Typed state/knowledge:
 - O_EMPTY = numeric known enum state 0, **NOT** TOKEN_VAZIO.
 - TOKEN_VAZIO_IDENTITY_ATTESTATION: caller-supplied IDs not authenticated.
-- TOKEN_VAZIO_STALE_HANDLE: task slot reuse without lifetime/epoch tokens.
+- IMPLEMENTED_UNTESTED_EPOCH: lifetime epoch persists on REAP and is checked on targeted events; trustworthy actor binding remains TOKEN_VAZIO.
 - NOT_RUN_PHYSICAL: no ARM32/ARM64 hardware test.
 - NOT_IMPLEMENTED_BOOT: BOOT is state transition, not firmware.
 - NOT_IMPLEMENTED_PREEMPTION: cooperative schedule only.
@@ -31,7 +31,7 @@ F05 rejected events leave context bitwise identical; F06 one RUNNING task;
 F07 deterministic schedule and replay; F08 bounded capacity and overflow;
 F09 shutdown blocked by active tasks; F10 capabilities cleared on REAP;
 F11 compiler no undefined symbols on three object targets;
-F12 host ASan/UBSan adversarial 30000 events.
+F12 host ASan/UBSan adversarial 30000 events; F13 stale task generation replay.
 
 Release/promotion matrix:
 SOURCE_READBACK -> OBJECT_BUILT -> HOST_FALSIFIERS -> VIRTUAL_BOOT ->
