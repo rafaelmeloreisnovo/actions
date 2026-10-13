@@ -18,6 +18,9 @@ int main(void){
   e.actor=(rnd(&seed)%11u);
   e.target=(rnd(&seed)&1u)?O_NONE:rnd(&seed)%11u;
   e.rights=rnd(&seed)%17u;
+  e.epoch=(e.target>=1u && e.target<=O_MAX)?
+      c.slots[e.target-1u].epoch+(e.opcode==O_SPAWN?1u:0u):0u;
+  if((rnd(&seed)&7u)==0u)e.epoch=0u; /* stale-event negative path */
   st=omega_step(&c,&e,&r);
   if(st!=r.status)return 2;
   if(st!=O_OK&&memcmp(&c,&prev,sizeof(c))!=0)return 3;
