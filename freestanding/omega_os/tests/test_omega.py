@@ -6,7 +6,7 @@ U=ctypes.c_uint;N=0xffffffff
 class Slot(ctypes.Structure):_fields_=[(k,U) for k in ("state","owner","rights")]
 class Context(ctypes.Structure):
  _fields_=[(k,U) for k in ("phase","sequence","digest","last_selected","running")]+[("slots",Slot*8)]
-class Event(ctypes.Structure):_fields_=[(k,U) for k in ("sequence","opcode","actor","target","rights")]
+class Event(ctypes.Structure):_fields_=[(k,U) for k in ("sequence","opcode","actor","target","rights","epoch")]
 class Receipt(ctypes.Structure):
  _fields_=[(k,U) for k in ("status","sequence","chosen","before_digest","after_digest","phase")]
 lib.omega_init.argtypes=[ctypes.POINTER(Context),U]
@@ -15,8 +15,10 @@ lib.omega_step.restype=U
 def raw(c):return bytes(ctypes.string_at(ctypes.byref(c),ctypes.sizeof(c)))
 def init(seed=19):
  c=Context();lib.omega_init(ctypes.byref(c),seed);return c
-def step(c,op,actor=0,target=N,rights=0,seq=None):
- e=Event(c.sequence+1 if seq is None else seq,op,actor,target,rights)
+def step(c,op,actor=0,target=N,rights=0,seq=None,epoch=None):
+ if epoch is None:
+  epoch=(c.slots[target-1].epoch + (1 if op==2 else 0)) if 1<=target<=8 else 0
+ e=Event(c.sequence+1 if seq is None else seq,op,actor,target,rights,epoch)
  r=Receipt();before=raw(c)
  st=lib.omega_step(ctypes.byref(c),ctypes.byref(e),ctypes.byref(r))
  assert st==r.status
@@ -100,7 +102,16 @@ class TestOmega(unittest.TestCase):
   for _ in range(2500):
    status,_=step(c,rng.randrange(1,13),rng.randrange(0,11),
                  rng.choice([N]+list(range(11))),rng.randrange(0,17))
-   self.assertTrue(0<=status<=10)
+   self.assertTrue(0<=status<=11)
+ def test_generation_replay_across_reused_task(self):
+  c=live();step(c,2,target=1,rights=7)
+  old=c.slots[0].epoch
+  step(c,7,target=1);step(c,9,target=1)
+  self.assertEqual(c.slots[0].epoch,old)
+  step(c,2,target=1,rights=7)
+  self.assertEqual(c.slots[0].epoch,old+1)
+  self.assertEqual(step(c,7,actor=1,target=1,epoch=old)[0],11)
+  self.assertEqual(step(c,7,actor=1,target=1,epoch=old+1)[0],0)
  def test_boot_argument(self):
   c=init();self.assertEqual(step(c,1,target=1)[0],4)
   self.assertEqual(step(c,1,rights=7)[0],8)
