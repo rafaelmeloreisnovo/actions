@@ -1,0 +1,97 @@
+name: RAFAELIA Omega-OS v0 / State Machine
+
+on:
+  pull_request:
+    paths:
+      - 'freestanding/omega_os/**'
+      - '.github/workflows/ci-omega-os-v0.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freestanding/omega_os/**'
+      - '.github/workflows/ci-omega-os-v0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: omega-os-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  objects:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {arch: x86_64, triple: x86_64-unknown-none-elf, flags: '-mno-red-zone'}
+          - {arch: armv7, triple: armv7-none-eabi, flags: '-march=armv7-a -mfloat-abi=soft'}
+          - {arch: aarch64, triple: aarch64-none-elf, flags: '-march=armv8-a'}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Cross compile no dependencies
+        env:
+          TARGET: ${{ matrix.triple }}
+          CFLAGS: ${{ matrix.flags }}
+          EXPECTED: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          read -r -a ARCH_FLAGS <<< "$CFLAGS"
+          mkdir -p out/omega-os
+          clang --target="$TARGET" "${ARCH_FLAGS[@]}" -std=c11 -O2 \
+            -ffreestanding -fno-builtin -fno-stack-protector \
+            -fno-unwind-tables -fno-asynchronous-unwind-tables \
+            -Wall -Wextra -Werror -c freestanding/omega_os/omega_core.c \
+            -o out/omega-os/core.o
+          test -z "$(nm -u out/omega-os/core.o)"
+          {
+            echo "source_sha=$EXPECTED"
+            echo "arch=${{ matrix.arch }}"
+            echo 'scope=OBJECT_ONLY_NO_OS_BOOT'
+            echo 'undefined=NONE'
+            sha256sum out/omega-os/core.o
+          } | tee out/omega-os/receipt.txt
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: omega-object-${{ matrix.arch }}
+          path: out/omega-os/
+          if-no-files-found: error
+          retention-days: 30
+
+  source-falsifiers:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Host replay, adversarial and sanitizer tests
+        shell: bash
+        env:
+          EXPECTED: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED"
+          clang -std=c11 -O2 -ffreestanding -fno-builtin -fPIC -shared \
+            -Wall -Wextra -Werror freestanding/omega_os/omega_core.c \
+            -o freestanding/omega_os/libomega.so
+          OMEGA_TEST_LIB=freestanding/omega_os/libomega.so \
+            python3 -m unittest discover -s freestanding/omega_os/tests -p 'test_*.py' -v
+          clang -std=c11 -O1 -g -fsanitize=address,undefined \
+            -fno-omit-frame-pointer -Wall -Wextra -Werror \
+            freestanding/omega_os/omega_core.c \
+            freestanding/omega_os/tests/fuzz_host.c -o /tmp/omega_fuzz
+          ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
+            UBSAN_OPTIONS=halt_on_error=1 /tmp/omega_fuzz
+          echo 'SCOPE=HOST_SYNTHETIC_ONLY_NO_BOOT_NO_HARDWARE'
