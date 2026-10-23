@@ -1,0 +1,59 @@
+name: RAFAELIA composition / static route contract
+
+on:
+  pull_request:
+    paths:
+      - 'composition/**'
+      - '.github/workflows/ci-rafaelia-composition.yml'
+      - 'freestanding/kernel4/**'
+      - 'freestanding/omega_os/**'
+      - 'freestanding/apk_bridge/**'
+      - 'rafcode/l0/**'
+      - 'START_HERE_RAFAELIA.md'
+      - 'THIRD_PARTY_PROVENANCE.md'
+  push:
+    branches: [main]
+    paths:
+      - 'composition/**'
+      - '.github/workflows/ci-rafaelia-composition.yml'
+      - 'freestanding/kernel4/**'
+      - 'freestanding/omega_os/**'
+      - 'freestanding/apk_bridge/**'
+      - 'rafcode/l0/**'
+      - 'START_HERE_RAFAELIA.md'
+      - 'THIRD_PARTY_PROVENANCE.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: rafaelia-composition-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  static-contract:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Checkout exact source head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Fail-closed route and schema checks
+        shell: bash
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+          python3 composition/validate.py
+          python3 -m unittest discover -s composition/tests -p 'test_*.py' -v
+          {
+            echo '### RAFAELIA composition contract'
+            echo "Source SHA: $EXPECTED_SOURCE_SHA"
+            echo 'Scope: STATIC ONLY (no runtime, install, boot, release or hardware claim)'
+            echo 'Promotion: BLOCKED'
+          } >> "$GITHUB_STEP_SUMMARY"

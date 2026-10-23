@@ -1,0 +1,194 @@
+{
+  "schema": "rafaelia.actions.composition/v1",
+  "repository": "rafaelmeloreisnovo/actions",
+  "observed_at": "2026-10-23",
+  "observed_main_head": "143477ff8636a65a920361646665fe08af23b6a2",
+  "scope": "NAVIGATION_AND_STATIC_GATE_ONLY",
+  "main_protection_observed": "OFF",
+  "workflow_runs_at_observed_head": "TOKEN_VAZIO_NOT_FOUND_IN_QUERY",
+  "claim_allowed": false,
+  "principles": [
+    "SOURCE != ARTIFACT != EXECUTION != EVIDENCE != CLAIM",
+    "TOKEN_VAZIO != 0",
+    "IMPLEMENTED_UNTESTED != PASS",
+    "CI_PASS != PHYSICAL_PASS",
+    "NO_AUTO_MERGE",
+    "NO_DELETION"
+  ],
+  "lanes": [
+    {
+      "id": "GOV",
+      "source_paths": [
+        "START_HERE_RAFAELIA.md",
+        "THIRD_PARTY_PROVENANCE.md"
+      ],
+      "workflow": "",
+      "proof_scope": "PROVENANCE_DOCUMENTS",
+      "current_evidence": "TOKEN_VAZIO_INDEPENDENT_REVIEW"
+    },
+    {
+      "id": "K4",
+      "source_paths": [
+        "freestanding/kernel4/kernel4.c",
+        "freestanding/kernel4/ci_gate.sh"
+      ],
+      "workflow": ".github/workflows/ci-kernel4-freestanding.yml",
+      "proof_scope": "HOST_LINKED_ELF_STRUCTURAL",
+      "current_evidence": "TOKEN_VAZIO_EXACT_MAIN_CI"
+    },
+    {
+      "id": "RAFCODE",
+      "source_paths": [
+        "rafcode/l0/kernel.c",
+        "rafcode/l0/verify.sh"
+      ],
+      "workflow": ".github/workflows/rafcode-l0.yml",
+      "proof_scope": "HOST_OBJECT_STATIC",
+      "current_evidence": "TOKEN_VAZIO_EXACT_MAIN_CI"
+    },
+    {
+      "id": "APK",
+      "source_paths": [
+        "freestanding/apk_bridge/apk_probe.c",
+        "freestanding/apk_bridge/boot_vm.c"
+      ],
+      "workflow": ".github/workflows/ci-rafaelia-apk-bridge.yml",
+      "proof_scope": "HOST_OBJECT_AND_SYNTHETIC_ZIP32_SUBSET",
+      "current_evidence": "TOKEN_VAZIO_EXACT_MAIN_CI"
+    },
+    {
+      "id": "OMEGA",
+      "source_paths": [
+        "freestanding/omega_os/omega_core.c",
+        "freestanding/omega_os/STATE_GATE_V1.md"
+      ],
+      "workflow": ".github/workflows/ci-omega-os-v0.yml",
+      "proof_scope": "HOST_OBJECT_AND_SYNTHETIC_STATE_MACHINE",
+      "current_evidence": "TOKEN_VAZIO_EXACT_MAIN_CI"
+    }
+  ],
+  "steps": [
+    {
+      "id": "P0-01",
+      "priority": "P0",
+      "lane": "GOV",
+      "state": "BLOCKED",
+      "depends_on": [],
+      "action": "Obter controle verificável de branch protection/ruleset e política de revisão; não inferir enforcement de arquivo YAML.",
+      "acceptance": "GET provider ruleset/protection shows enforcement and approved review authority",
+      "evidence_rule": "provider snapshot with URL, timestamp and exact base SHA",
+      "gap": "TOKEN_VAZIO_PROVIDER_ENFORCEMENT",
+      "rollback": "No ruleset mutation in this proposal; remove only an explicitly approved rule by separate authorization"
+    },
+    {
+      "id": "P0-02",
+      "priority": "P0",
+      "lane": "RAFCODE",
+      "state": "NEXT",
+      "depends_on": [],
+      "action": "Corrigir no workflow RAFCODE o uso de GITHUB_REF para PR merge-ref: obter e verificar HEAD exato sem credenciais persistidas.",
+      "acceptance": "CI print/receipt git rev-parse HEAD == github.event.pull_request.head.sha em PR, ou github.sha em push",
+      "evidence_rule": "PR head SHA + Actions run/jobs logs, sem promoção física",
+      "gap": "TOKEN_VAZIO_RAFCODE_EXACT_HEAD_PROOF",
+      "rollback": "Reverter somente o workflow RAFCODE ao blob anterior caso teste regressivo falhe"
+    },
+    {
+      "id": "P0-03",
+      "priority": "P0",
+      "lane": "GOV",
+      "state": "BLOCKED",
+      "depends_on": [
+        "P0-02"
+      ],
+      "action": "Aferir quatro lanes no mesmo snapshot com runs exatos e receipts segregados; não herdar PASS por merge anterior.",
+      "acceptance": "quatro verificações vinculadas ao mesmo commit, conclusões, artifacts e resultados tipados",
+      "evidence_rule": "head SHA + workflow run ids + job conclusions + artifact hashes quando houver",
+      "gap": "TOKEN_VAZIO_EXACT_HEAD_JOINT_RECEIPT",
+      "rollback": "Superseder o receipt, sem apagar runs históricos"
+    },
+    {
+      "id": "P1-01",
+      "priority": "P1",
+      "lane": "APK",
+      "state": "NEXT",
+      "depends_on": [],
+      "action": "Adicionar corpus adversarial para ZIP32: sobreposições, CRC/decompressão (como gate separado), ZIP64 e inconsistência central/local; manter assinatura fora do parser.",
+      "acceptance": "fixtures negativas rejeitadas, sanitisers host, compatibilidade com fixtures positivas preservada",
+      "evidence_rule": "diff fonte + suíte com contagem + CI exact head, falhas tipo por tipo",
+      "gap": "TOKEN_VAZIO_ZIP32_COMPLETE_VALIDATION",
+      "rollback": "Reverter delta do parser ou isolar a fixture mantendo baseline"
+    },
+    {
+      "id": "P1-02",
+      "priority": "P1",
+      "lane": "APK",
+      "state": "BLOCKED",
+      "depends_on": [
+        "P1-01"
+      ],
+      "action": "Vincular um produtor Android/Termux real ao adapter L1, com bootstrap/pacotes/SDK e chaves fora do repositório; produtor externo governa o app.",
+      "acceptance": "APK instalável oficialmente alinhado/assinado verificado, com identidade SHA e caminho de instalação",
+      "evidence_rule": "producer repo + exact HEAD + build logs + apksigner verify + APK SHA256",
+      "gap": "TOKEN_VAZIO_ANDROID_PRODUCER_AUTHORITY",
+      "rollback": "Não publicar/substituir APK; abortar build hospedado sem tocar aparelho"
+    },
+    {
+      "id": "P1-03",
+      "priority": "P1",
+      "lane": "K4",
+      "state": "BLOCKED",
+      "depends_on": [
+        "P0-03"
+      ],
+      "action": "Reproduzir o mesmo artefato/algoritmo em ARMv7 e AArch64 com receipt físico, incluindo stack, ABI, falha/tempo e regressão.",
+      "acceptance": "logs de execução real e identificação ABI + digest do artefato, resultado comparável ao host",
+      "evidence_rule": "device/sdk/ABI + exact build hash + timestamp + medições; CI host != hardware",
+      "gap": "TOKEN_VAZIO_PHYSICAL_ARM32_ARM64",
+      "rollback": "Executar sem modificações de firmware/bootloader; remover app apenas mediante autorização"
+    },
+    {
+      "id": "P2-01",
+      "priority": "P2",
+      "lane": "OMEGA",
+      "state": "BLOCKED",
+      "depends_on": [
+        "P0-03"
+      ],
+      "action": "Resolver identidade atestada, single-writer, epoch e limites de concorrência para eventos de Ω-OS; executar falsificadores adicionais.",
+      "acceptance": "actor forged/stale/replay/reap/concurrent sequencer tests falham fechados com invariância de contexto",
+      "evidence_rule": "ABI v+source hash + corpus de eventos + test receipts + revisão independente",
+      "gap": "TOKEN_VAZIO_TRUSTED_IDENTITY_ATTESTATION",
+      "rollback": "Manter Ω-OS sintético; não declarar isolamento ou processo real"
+    },
+    {
+      "id": "P2-02",
+      "priority": "P2",
+      "lane": "OMEGA",
+      "state": "BLOCKED",
+      "depends_on": [
+        "P2-01"
+      ],
+      "action": "Especificar separadamente boot virtual QEMU, ELF/linker/entry ABI, drivers e isolamento, em repositório produtor apropriado.",
+      "acceptance": "boot virtual medido, imagem versionada, rejeição de imagens inválidas, boot trace determinístico",
+      "evidence_rule": "producer authority + target ISA + QEMU image digest + run trace",
+      "gap": "TOKEN_VAZIO_VIRTUAL_BOOT",
+      "rollback": "Sem flash físico; restaurar imagem virtual anterior"
+    },
+    {
+      "id": "P3-01",
+      "priority": "P3",
+      "lane": "GOV",
+      "state": "BLOCKED",
+      "depends_on": [
+        "P0-01",
+        "P1-02",
+        "P2-02"
+      ],
+      "action": "Separar autoria de deltas, licenças por arquivo, revisão humana e provider enforcement antes de qualquer release ou claim.",
+      "acceptance": "licenças auditadas, PR aprovada, evidência reproduzível e release escopada",
+      "evidence_rule": "SPDX/grants + review receipt + protected merge + release artifact SHA",
+      "gap": "TOKEN_VAZIO_RELEASE_AUTHORIZATION",
+      "rollback": "Nenhuma promoção/release enquanto qualquer gate estiver vazio"
+    }
+  ]
+}
