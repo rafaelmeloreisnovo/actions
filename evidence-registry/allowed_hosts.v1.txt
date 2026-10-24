@@ -1,0 +1,12 @@
+# RAFAELIA evidence-registry exact public source hosts (2026-10-24).
+# New hosts require a reviewed change and hostile redirect falsifier.
+help.openai.com
+openai.com
+community.openai.com
+www.anthropic.com
+blog.google
+discuss.ai.google.dev
+github.blog
+github.com
+www.bing.com
+search.yahoo.com
