@@ -3,7 +3,7 @@ import ctypes,os,random,unittest
 from pathlib import Path
 lib=ctypes.CDLL(os.environ.get("OMEGA_TEST_LIB",str(Path(__file__).resolve().parents[1]/"libomega.so")))
 U=ctypes.c_uint;N=0xffffffff
-class Slot(ctypes.Structure):_fields_=[(k,U) for k in ("state","owner","rights")]
+class Slot(ctypes.Structure):_fields_=[(k,U) for k in ("state","owner","rights","epoch")]
 class Context(ctypes.Structure):
  _fields_=[(k,U) for k in ("phase","sequence","digest","last_selected","running")]+[("slots",Slot*8)]
 class Event(ctypes.Structure):_fields_=[(k,U) for k in ("sequence","opcode","actor","target","rights","epoch")]
@@ -30,6 +30,14 @@ def step(c,op,actor=0,target=N,rights=0,seq=None,epoch=None):
 def live():
  c=init();assert step(c,1)[0]==0;return c
 class TestOmega(unittest.TestCase):
+ def test_ctypes_matches_documented_c_abi(self):
+  # The C header has 4 ou32 fields per slot (epoch is the 4th).
+  # A stale three-field mirror corrupts offsets and invalidates all replay tests.
+  self.assertEqual(ctypes.sizeof(U),4)
+  self.assertEqual(ctypes.sizeof(Slot),16)
+  self.assertEqual(ctypes.sizeof(Context),148)
+  self.assertEqual(Context.slots.offset,20)
+  self.assertEqual(Slot.epoch.offset,12)
  def test_initial(self):
   c=init();self.assertEqual((c.phase,c.sequence,c.running),(0,0,N))
  def test_boot_authority(self):
