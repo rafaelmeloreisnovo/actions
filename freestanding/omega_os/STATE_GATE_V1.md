@@ -38,3 +38,21 @@ SOURCE_READBACK -> OBJECT_BUILT -> HOST_FALSIFIERS -> VIRTUAL_BOOT ->
 PHYSICAL_BOOT -> INDEPENDENT_REVIEW -> RIGHTS -> PROVIDER_ENFORCEMENT -> CLAIM
 Each gate independent; no forward inference, automatic promotion, or merge.
 ROLLBACK: close draft PR with no changes to main, supersede ledger entry.
+
+## 2026-10-24 bounded exhaustive successor (proposal; no global proof)
+
+New separate HOST-ONLY falsifier `tests/exhaustive_host.c` enumerates
+5 reachable seed states × 12 event opcode values × 11 actor IDs ×
+6 target values × 4 rights values × 4 epoch variants × 2 sequence variants
+= **126,720 modeled events**. Each event executes twice from identical state.
+The harness checks C ABI sizes, determinism, rejected-event atomicity,
+a single RUNNING task, EMPTY-slot capability clearing, bounded targets and
+consistency of sequence/receipt/digest. It runs under ASan/UBSan on hosted CI.
+
+This is a finite projection, **not** all possible machine states; it does not
+prove memory protection, authenticated caller identities, interleaving/
+concurrency, CPU context switching, real IRQs, firmware boot or ARM hardware.
+Host fuzz and Python replay suites remain unchanged. On any failure, stop
+the gate and preserve the offending source HEAD and exit code; no automatic
+promotion of scientific or security claims. Source-only artefact; human merge
+authority and full licenses remain unresolved.
