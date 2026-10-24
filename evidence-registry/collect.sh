@@ -36,7 +36,7 @@ approved_url() {
   grep -Fqx -- "$host" "$HOSTS"
 }
 
-while IFS="$(printf '\\t')" read -r provider source_class url; do
+while IFS="$(printf '\t')" read -r provider source_class url; do
   [[ -z "${provider:-}" ]] && continue
   [[ "${provider:0:1}" == "#" ]] && continue
   [[ -z "${url:-}" ]] && continue
