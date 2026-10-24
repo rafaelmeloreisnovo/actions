@@ -1,0 +1,195 @@
+{
+  "schema": "rafaelia.insection.navigation/v1",
+  "intent": "human and agent READ ONLY path index; not a runtime",
+  "owner_repo": "rafaelmeloreisnovo/actions",
+  "pr": 16,
+  "source_baseline": {
+    "sha": "2099215cbf8a5610c381ad1f9bf259dd49a15195",
+    "kind": "candidate source before documentation",
+    "object_hash": "Git blob SHA-1 identifiers, not signatures"
+  },
+  "claims": {
+    "claim_allowed": false,
+    "merge_authorized": false,
+    "remote_ci_pass": false,
+    "physical_execution": false,
+    "hardware_activated": false,
+    "promotion": "HOLD"
+  },
+  "entrypoints": {
+    "human": "freestanding/dispatch_l0/INDEX.md",
+    "agent": "freestanding/dispatch_l0/navigation.v1.json",
+    "walkthrough": "freestanding/dispatch_l0/docs/CODE_GUIDE.md",
+    "gates": "freestanding/dispatch_l0/docs/GATES_AND_RELATIONS.md"
+  },
+  "source_nodes": [
+    {
+      "id": "INDEX",
+      "path": "freestanding/dispatch_l0/INDEX.md",
+      "kind": "human-index"
+    },
+    {
+      "id": "TRACE",
+      "path": "freestanding/dispatch_l0/docs/CODE_GUIDE.md",
+      "kind": "code-guide"
+    },
+    {
+      "id": "GATES",
+      "path": "freestanding/dispatch_l0/docs/GATES_AND_RELATIONS.md",
+      "kind": "acceptance"
+    },
+    {
+      "id": "HEADER",
+      "path": "freestanding/dispatch_l0/dispatch.h",
+      "kind": "source",
+      "git_blob_sha1": "dd355383185e4f9c9dda22de089cdcaa28eedea6",
+      "symbols": [
+        "rd_request",
+        "rd_receipt",
+        "RD_ALL_PRESENT",
+        "RD_PLAN_ONLY"
+      ]
+    },
+    {
+      "id": "CORE",
+      "path": "freestanding/dispatch_l0/dispatch.c",
+      "kind": "source",
+      "git_blob_sha1": "8f65489dfed597cd437a43cde14fb755eeaabef8",
+      "symbols": [
+        "rd_plan"
+      ]
+    },
+    {
+      "id": "TESTS",
+      "path": "freestanding/dispatch_l0/tests/test_dispatch.c",
+      "kind": "host-test",
+      "git_blob_sha1": "650ad73553f615dbcdf217004d767078554de57f"
+    },
+    {
+      "id": "VERIFY",
+      "path": "freestanding/dispatch_l0/tests/verify.sh",
+      "kind": "host-cross-build",
+      "git_blob_sha1": "34348519ade87e5b5cef895a40628ead7787b7a1"
+    },
+    {
+      "id": "WORKFLOW",
+      "path": ".github/workflows/ci-rafaelia-dispatch-l0.yml",
+      "kind": "provider-host",
+      "git_blob_sha1": "8ea79e46eaa19b28a901ea9adc19dd4de90e29d8"
+    },
+    {
+      "id": "LICENSES",
+      "path": "freestanding/dispatch_l0/LICENSES/README.md",
+      "kind": "rights",
+      "git_blob_sha1": "6446751b0445d4d2c1e5de34b1105b55d88646ea"
+    },
+    {
+      "id": "DEMO",
+      "path": "freestanding/dispatch_l0/examples/demo.c",
+      "kind": "host-demo"
+    },
+    {
+      "id": "NAV_CHECK",
+      "path": "freestanding/dispatch_l0/docs/check_navigation.py",
+      "kind": "host-script"
+    },
+    {
+      "id": "README",
+      "path": "freestanding/dispatch_l0/README.md",
+      "kind": "overview"
+    }
+  ],
+  "edges": [
+    {
+      "from": "INDEX",
+      "to": "TRACE",
+      "type": "teaches"
+    },
+    {
+      "from": "INDEX",
+      "to": "GATES",
+      "type": "acceptance"
+    },
+    {
+      "from": "TRACE",
+      "to": "HEADER",
+      "type": "derives_from"
+    },
+    {
+      "from": "TRACE",
+      "to": "CORE",
+      "type": "derives_from"
+    },
+    {
+      "from": "DEMO",
+      "to": "CORE",
+      "type": "calls_hosted"
+    },
+    {
+      "from": "GATES",
+      "to": "TESTS",
+      "type": "falsified_by"
+    },
+    {
+      "from": "VERIFY",
+      "to": "CORE",
+      "type": "compiles"
+    },
+    {
+      "from": "WORKFLOW",
+      "to": "VERIFY",
+      "type": "invokes_hosted"
+    },
+    {
+      "from": "LICENSES",
+      "to": "CORE",
+      "type": "rights_not_granted"
+    },
+    {
+      "from": "README",
+      "to": "INDEX",
+      "type": "navigation"
+    }
+  ],
+  "demonstrations": [
+    {
+      "id": "N1",
+      "status": 6,
+      "route": 2,
+      "fallback": 0,
+      "rollback_required": 0
+    },
+    {
+      "id": "N2",
+      "status": 6,
+      "route": 1,
+      "fallback": 1,
+      "rollback_required": 0
+    },
+    {
+      "id": "N3",
+      "status": 5,
+      "route": 0,
+      "fallback": 0,
+      "rollback_required": 1
+    },
+    {
+      "id": "N4",
+      "status": 0,
+      "route": 0,
+      "fallback": 0,
+      "rollback_required": 1
+    }
+  ],
+  "typed_gaps": [
+    "TOKEN_VAZIO_SOURCE_ATTESTATION",
+    "TOKEN_VAZIO_WATCHDOG_INDEPENDENCE",
+    "TOKEN_VAZIO_HARDWARE_CAPABILITY",
+    "TOKEN_VAZIO_LICENSE_GRANT",
+    "TOKEN_VAZIO_HUMAN_REVIEW",
+    "TOKEN_VAZIO_PROVIDER_PROTECTION",
+    "TOKEN_VAZIO_REMOTE_CI",
+    "NOT_RUN_GPU_NUMA_DEX_ART_ANDROID"
+  ],
+  "agent_rule": "Choose 1-3 nodes, verify SHA and source scope, never mutate, delete, merge or promote."
+}

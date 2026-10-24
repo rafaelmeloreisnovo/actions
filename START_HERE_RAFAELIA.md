@@ -81,3 +81,8 @@ R3=<F_ok: inherited Gradle route, local Kernel4 route and rights boundary are se
 ## 2026-10-24 authorial provenance lane — DRAFT ONLY
 
 For origin credits and navigable locations, route to `AUTHORSHIP_AND_CREDITS.md`; for type-annotated folder scopes, `provenance/lineage.v1.json`; for an independent freestanding structural gate and negative tests, `freestanding/provenance_core/README.md`. No upstream code replaced. No promotion or release permission inherited from a local test. Mixed `.github/` files require per-file provenance audit. Rollback: close this draft PR without modifying `main`.
+
+
+## 2026-10-24 — rota documental candidata Dispatch L0 (PR #16; NÃO PROMOVER)
+
+Para pessoas e agentes de software: [INSECTION / índice Dispatch L0](freestanding/dispatch_l0/INDEX.md) → [guia ligado ao código](freestanding/dispatch_l0/docs/CODE_GUIDE.md) → [gates e riscos](freestanding/dispatch_l0/docs/GATES_AND_RELATIONS.md) → [índice JSON de nós](freestanding/dispatch_l0/navigation.v1.json). O caminho apontado é um **adendo DRAFT**, e não software implantado; código herdado Gradle, Kernel4 e os demais produtores não são substituídos. `rd_plan` só planeja, nenhum hardware é ativado; `claim_allowed=false` e autorização de merge permanecem negadas até evidência independente.

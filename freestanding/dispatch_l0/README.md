@@ -35,3 +35,8 @@ Host test at `-O0` and `-O2` (`HOST_CC=clang` or `HOST_CC=gcc`); cross objects u
 ## R3
 
 F_ok = local compiled candidate, tests, per-file git blob SHA. F_gap = source legal clearance, exact-HEAD hosted CI, hardware/ABI device tests, independent reviewer, provider branch protection, actual watchdog authority, verified performance. F_next = exact SHA provider CI, independent review and granted rights; only then consider adapters with separate reversible PRs. Rollback = close DRAFT PR without deleting source branch; no base/main mutation.
+
+
+## Navegação humana e por agentes — INSECTION (adendo da PR #16)
+
+O [índice de navegação](INDEX.md) fornece rotas curtas por intenção, sem ler o fork inteiro. O [guia código-fonte → comportamento](docs/CODE_GUIDE.md), a [matriz de gates](docs/GATES_AND_RELATIONS.md) e o [índice JSON para agentes](navigation.v1.json) apontam para cada contrato, testes, exemplo e licenças. O [demonstrador host-only](examples/demo.c) e o [verificador documental](docs/check_navigation.py) **não** fazem parte do runtime C freestanding. Essas páginas são uma camada aditiva proposta; não promovem a PR e não substituem aprovação humana, CI de HEAD ou proteção de main.
