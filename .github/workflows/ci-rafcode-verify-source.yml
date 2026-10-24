@@ -1,0 +1,28 @@
+name: RAFCODE exact source gate
+on:
+  pull_request:
+    paths:
+      - 'rafcode/verify-source/**'
+      - '.github/workflows/ci-rafcode-verify-source.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'rafcode/verify-source/**'
+      - '.github/workflows/ci-rafcode-verify-source.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  source-gate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: ./rafcode/verify-source
+        with:
+          expected-sha: ${{ github.event.pull_request.head.sha || github.sha }}
+      - run: python3 rafcode/verify-source/test_verify.py
+      - run: bash -n rafcode/verify-source/verify.sh
