@@ -48,3 +48,23 @@ Actions execution still require their own receipts.
 
 These are HOST/L1 controls. Curl, TLS, Git, jq and GitHub Actions are not
 freestanding components, and this workflow is not training any AI model.
+
+## 2026-10-24 — Custody / human-merge successor (draft, non-promoting)
+
+The collector may preserve raw transport responses, including non-200 status
+and unsuccessful partial downloads. Only `curl exit=0 && HTTP 200` is permitted
+to populate the **source-body** SHA-256 field. Retained error bodies are
+diagnostic artefacts, never authenticated primary-source evidence.
+
+The scheduled publisher no longer performs `git push` on `main`. It commits
+new ledger records to a unique `evidence/review-<run_key>` branch and asks
+GitHub to open a **Draft PR** for explicit human review. A provider policy may
+disallow PR creation by GitHub Actions; that is a typed `PROVIDER_BLOCKED`
+condition, not authorization to bypass protections. Every branch is retained
+for rollback/reconstruction, including a branch whose PR could not be opened.
+No automatic merge, branch cleanup, license promotion, or historical deletion.
+
+The policy is tested offline in
+`evidence-registry/tests/test_custody_gate.py`; an Actions CI run on an exact
+commit is still required before deployment. The publisher and HTTP/TLS client
+are HOST infrastructure, not freestanding/bare-metal runtime code.

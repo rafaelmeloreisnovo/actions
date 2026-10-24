@@ -56,8 +56,11 @@ jobs:
     needs: [collect]
     runs-on: ubuntu-24.04
     timeout-minutes: 8
+    # This job can write only a new evidence review branch.
+    # Pull request publication permission never implies merge authority.
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Checkout exact authorized main
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
@@ -69,10 +72,11 @@ jobs:
         with:
           name: evidence-registry-${{ github.run_id }}-${{ github.run_attempt }}
           path: evidence-artifact
-      - name: Verify custody and append ledger only
+      - name: Verify custody and prepare review-only branch
         shell: bash
         env:
           EXPECTED: ${{ github.sha }}
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$EXPECTED"
@@ -95,4 +99,15 @@ jobs:
             exit 0
           fi
           git commit -m "evidence: capture $run_key"
-          git push origin HEAD:main
+          # Unique immutable run identifier: NEVER push directly into main,
+          # force-push, merge, delete a branch, or auto-promote a claim.
+          branch="evidence/review-$run_key"
+          git push origin "HEAD:refs/heads/$branch"
+          echo "evidence_candidate_branch=$branch" >> "$GITHUB_STEP_SUMMARY"
+          # This may be forbidden by provider governance. On failure the
+          # candidate branch remains available for manual review.
+          command -v gh >/dev/null
+          gh pr create --draft --base main --head "$branch" \
+            --title "evidence: review $run_key" \
+            --body "Source HEAD: $EXPECTED. Artifact: evidence-registry-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT. SHA256 verified relative to collector. NO source claims or automatic merge; reviewer must authorize each promotion."
+          echo "NO_AUTOMATIC_MERGE=true" >> "$GITHUB_STEP_SUMMARY"
