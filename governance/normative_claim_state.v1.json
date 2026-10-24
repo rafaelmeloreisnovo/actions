@@ -1,0 +1,25 @@
+{
+  "schema": "rafaelia.normative-claim-state/v1",
+  "observed_date": "2026-10-24",
+  "authority": "human-review-required",
+  "repo": "rafaelmeloreisnovo/actions",
+  "claims_are_automatically_promoted": false,
+  "best_practices_reference_allowed": true,
+  "scoped_implementation_claim_requires_receipt": true,
+  "full_conformity_claim_allowed": false,
+  "certification_claim_allowed": false,
+  "certification_evidence_status": "TOKEN_VAZIO_NOT_OBSERVED",
+  "conformity_assessment_evidence_status": "TOKEN_VAZIO_NOT_OBSERVED",
+  "origin": "policy-correction-with-user-instruction",
+  "required_for_certification_claim": [
+    "certificate_identifier",
+    "certificate_holder",
+    "standard_edition",
+    "certification_body",
+    "certified_scope",
+    "validity_period",
+    "authenticated_registry_or_issuer_check",
+    "accreditation_if_claimed"
+  ],
+  "note": "No certificate was inspected in this change. This is a claim gate, not certification itself."
+}
