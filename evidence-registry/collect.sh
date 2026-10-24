@@ -73,7 +73,12 @@ while IFS="$(printf '\t')" read -r provider source_class url; do
   last_modified="$(grep -i '^last-modified:' "$headers" 2>/dev/null | tail -1 | sed 's/^[Ll]ast-[Mm]odified:[[:space:]]*//' | tr -d '\r' || true)"
   etag="$(grep -i '^etag:' "$headers" 2>/dev/null | tail -1 | sed 's/^[Ee][Tt]ag:[[:space:]]*//' | tr -d '\r' || true)"
   sha="TOKEN_VAZIO"
-  [[ -s "$body" ]] && sha="$(sha256sum "$body" | awk '{print $1}')"
+  # An incomplete/redirected response may leave bytes on disk.
+  # Only a completed HTTP 200 response has a usable source-body digest.
+  # Retain partial raw bytes for diagnostics, but not as evidence of collection.
+  if [[ $rc -eq 0 && "$http_status" == 200 && -f "$body" ]]; then
+    sha="$(sha256sum "$body" | awk '{print $1}')"
+  fi
   error=""
   if [[ $rc -ne 0 ]]; then
     error="curl_exit_$rc: $(tr '\n' ' ' < "$err" | head -c 800)"
