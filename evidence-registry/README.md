@@ -29,3 +29,22 @@ bash evidence-registry/collect.sh evidence-registry/sources.tsv evidence-artifac
 ```
 
 Os corpos brutos ficam no artifact do GitHub Actions. O Git registra ledger e manifests para manter trilha documental sem transformar o repositório em depósito de centenas de GB.
+
+## Zero-trust collection successor (2026-10-24; proposed)
+
+Source hosts are explicitly allowlisted in `allowed_hosts.v1.txt`. Only HTTPS
+URLs are accepted; implicit redirects are **not followed**. A 301/302 or other
+non-200 response is retained as a typed observation, **not** a fetched source
+claim. Bodies are bounded at 10 MiB. URL policy is independently falsified
+without external network calls in `tests/test_sources.py`.
+
+The workflow separates a network-facing read-only `collect` job from an
+optional main-only `publish-ledger` job with `contents: write`. This enforces
+least privilege on the HTTP collector; publish checks the same-run artifact's
+SHA256SUMS and exact source SHA before append-only commit. A hash verifies
+artifact integrity relative to the uploader; it is not a vendor signature or
+independent attestation. Provider protections, independent review, and actual
+Actions execution still require their own receipts.
+
+These are HOST/L1 controls. Curl, TLS, Git, jq and GitHub Actions are not
+freestanding components, and this workflow is not training any AI model.
