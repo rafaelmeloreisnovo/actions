@@ -1,5 +1,5 @@
-# RAFAELIA-local test lane; not an upstream Gradle Actions workflow.
-# Exact source SHA, least privilege, scoped tests; no release or protected branch change.
+# RAFAELIA independent host verification: the L0 production unit has no hosted runtime.
+# No release, no legal certification, no provider enforcement is inferred from CI.
 name: RAFAELIA original rights-core / scoped host checks
 
 on:
@@ -16,21 +16,27 @@ on:
       - 'provenance/**'
       - 'AUTHORSHIP_AND_CREDITS.md'
       - '.github/workflows/ci-rafaelia-rights.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
+concurrency:
+  group: ra-rights-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   rights-host:
     runs-on: ubuntu-24.04
-    timeout-minutes: 6
+    timeout-minutes: 8
     steps:
       - name: Checkout immutable candidate revision
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
           persist-credentials: false
-      - name: Run bounded negative gates
+      - name: Run bounded negative checks and sanitizer
         shell: bash
         env:
           EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
@@ -39,9 +45,16 @@ jobs:
           test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
           python3 -m json.tool provenance/lineage.v1.json >/dev/null
           python3 -m unittest discover -s freestanding/provenance_core/tests -p 'test_*.py' -v
+          clang -std=c11 -O1 -g -Wall -Wextra -Werror \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            freestanding/provenance_core/rights_core.c \
+            freestanding/provenance_core/tests/fuzz_host.c -o /tmp/ra_rights_fuzz
+          ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
+            UBSAN_OPTIONS=halt_on_error=1 /tmp/ra_rights_fuzz
           {
-            echo '### RAFAELIA rights-core: hosted scoped checks'
-            echo "Source HEAD: $EXPECTED_SOURCE_SHA"
-            echo 'No legal clearance, no code-originality certification, no physical ARM execution.'
-            echo 'Release authorization: BLOCKED.'
+            echo '### RAFAELIA rights-core: SCOPED HOST evidence'
+            echo "source_head=$EXPECTED_SOURCE_SHA"
+            echo 'model=2 x 128 finite masks + 25 invalid proof bit falsifiers'
+            echo 'no legal clearance, no code originality certification, no physical ARM execution'
+            echo 'release_authorized=0'
           } >> "$GITHUB_STEP_SUMMARY"

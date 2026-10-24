@@ -1,3 +1,5 @@
+# RAFAELIA authorial L0 verification; Git network/checkout is HOST-ONLY.
+# This does not turn a hosted runner or Git client into freestanding runtime code.
 name: RAFCODE authorial L0
 
 on:
@@ -6,8 +8,7 @@ on:
       - 'rafcode/l0/**'
       - '.github/workflows/rafcode-l0.yml'
   push:
-    branches:
-      - main
+    branches: [main]
     paths:
       - 'rafcode/l0/**'
       - '.github/workflows/rafcode-l0.yml'
@@ -16,17 +17,34 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: rafcode-l0-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   gate:
     runs-on: ubuntu-24.04
+    timeout-minutes: 8
     steps:
-      - name: Fetch exact ref without marketplace actions
-        shell: sh
+      - name: Fetch and verify exact immutable source commit
+        shell: bash
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
-          git init .
+          set -euo pipefail
+          [[ "$EXPECTED_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]] || exit 2
+          git init -q .
           git remote add origin "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
-          git fetch --depth=1 origin "$GITHUB_REF"
-          git checkout --detach FETCH_HEAD
-      - name: Verify authorial L0 leaf
-        shell: sh
-        run: sh rafcode/l0/verify.sh
+          git -c protocol.version=2 fetch --no-tags --depth=1 origin "$EXPECTED_SOURCE_SHA"
+          git checkout -q --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+          printf 'source_head=%s\n' "$EXPECTED_SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+      - name: Verify authorial L0 leaf at exact commit
+        shell: bash
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+          sh rafcode/l0/verify.sh
+          echo 'scope=HOST_SOURCE_GATE_ONLY; ARM_RUNTIME=NOT_RUN; release=BLOCKED' >> "$GITHUB_STEP_SUMMARY"

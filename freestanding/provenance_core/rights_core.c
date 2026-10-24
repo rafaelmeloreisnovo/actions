@@ -9,6 +9,14 @@
 void ra_provenance_check(const ra_provenance_input *input,
                          ra_provenance_result *result)
 {
+    /* Snapshot input before any output write to permit overlapping storage.
+     * This requires only two registers; no heap, memcpy, or runtime helper. */
+    ra_word observed_origin = RA_ORIGIN_UNRESOLVED;
+    ra_word observed_claims = 0u;
+    if (input != (const ra_provenance_input *)0) {
+        observed_origin = input->origin;
+        observed_claims = input->claimed_proofs;
+    }
     /* The absent output pointer cannot be written; no side effects exist. */
     if (result == (ra_provenance_result *)0) return;
 
@@ -19,25 +27,24 @@ void ra_provenance_check(const ra_provenance_input *input,
     result->release_authorized = 0u;
 
     /* Unknown origin is a genuine unknown, not a class to auto-approve. */
-    if (input == (const ra_provenance_input *)0) return;
-    if (input->origin == RA_ORIGIN_UNRESOLVED) return;
+    if (observed_origin == RA_ORIGIN_UNRESOLVED) return;
 
     /* Combined paths need file-by-file split; one flag set cannot certify both. */
-    if (input->origin == RA_ORIGIN_MIXED) return;
-    if (input->origin != RA_ORIGIN_INHERITED &&
-        input->origin != RA_ORIGIN_LOCAL) {
+    if (observed_origin == RA_ORIGIN_MIXED) return;
+    if (observed_origin != RA_ORIGIN_INHERITED &&
+        observed_origin != RA_ORIGIN_LOCAL) {
         result->state = RA_STATE_BAD_INPUT;
         return;
     }
     /* Reject arbitrary/unknown bits rather than discarding input mistakes. */
-    if ((input->claimed_proofs & ~((ra_word)RA_ALL_PROOFS)) != 0u) {
+    if ((observed_claims & ~((ra_word)RA_ALL_PROOFS)) != 0u) {
         result->state = RA_STATE_BAD_INPUT;
         return;
     }
 
     /* The same evidence obligation applies to either authorial class. */
-    result->missing_rights = RA_RIGHTS_PROOFS & ~input->claimed_proofs;
-    result->missing_evidence = RA_EVIDENCE_PROOFS & ~input->claimed_proofs;
+    result->missing_rights = RA_RIGHTS_PROOFS & ~observed_claims;
+    result->missing_evidence = RA_EVIDENCE_PROOFS & ~observed_claims;
 
     /* Ordering matters: unresolved rights take priority over test status. */
     if (result->missing_rights != 0u) {
