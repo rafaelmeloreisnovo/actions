@@ -113,3 +113,7 @@ This repository is a fork of **Gradle Actions**. Its original Gradle implementat
 ## RAFAELIA operational risk route — 2026-10-24
 
 Source/test-only follow-up (no upstream runtime rewriting): [scoped engineering risk ledger](governance/RISK_REGISTER_20261024.md) tracks exact-HEAD checkout, Ω-OS ABI test mirror, new freestanding source falsifiers and typed provider/rights/hardware gaps. This is a proposal on a feature branch, not release authorization.
+
+## Uso responsável de referências normativas
+
+A RAFAELIA pode usar [boas práticas inspiradas em normas](governance/NORMATIVE_CLAIM_POLICY_V1.md), mas **não declara certificação, aprovação normativa ou conformidade integral sem evidência independente específica**. O [estado tipado](governance/normative_claim_state.v1.json) conserva `TOKEN_VAZIO_NOT_OBSERVED` quando não há prova. Os resultados de CI são apenas testes de código, não auditorias de certificação.

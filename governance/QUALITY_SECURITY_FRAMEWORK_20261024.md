@@ -47,3 +47,7 @@ Controls evolve with `INTENT → CURRENT_STATE → SOURCE → AUTHORITY →
 CHANGE → TEST → RECEIPT → R3`. DMAIC can organize problem solving;
 PDCA can supervise recurring operation. Neither establishes a statistical
 Six Sigma level without measured process performance.
+
+## Correção de precisão — normativo ≠ certificação (2026-10-24)
+
+As referências acima servem **exclusivamente como fontes de boas práticas, critérios de projeto e testes proporcionais**, e não constituem certificação, acreditação, homologação, aprovação ISO/NIST, implementação integral ou conclusão de conformidade. Sem avaliação de requisitos específicos, a terminologia correta é "boas práticas inspiradas em"; para alegações mais fortes, seguir o gate de evidências e escopo de [NORMATIVE_CLAIM_POLICY_V1.md](NORMATIVE_CLAIM_POLICY_V1.md). No estado registrado, `certification_claim_allowed=false`, `full_conformity_claim_allowed=false` e prova de certificação = `TOKEN_VAZIO_NOT_OBSERVED`. A ISO não emite certificados e o NIST SSDF é orientação de desenvolvimento seguro, não certificação. Esta correção prevalece sobre qualquer ambiguidade de linguagem precedente sem apagar os registros.
