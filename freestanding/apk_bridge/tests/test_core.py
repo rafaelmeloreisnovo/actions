@@ -1,4 +1,4 @@
-import ctypes,io,os,struct,unittest,zipfile
+import ctypes,io,os,struct,unittest,zipfile,warnings
 from pathlib import Path
 p=Path(__file__).resolve().parents[1]
 lib=ctypes.CDLL(os.environ.get("RA_BRIDGE_TEST_LIB",str(p/"libra_bridge.so")))
@@ -40,6 +40,22 @@ class Structural(unittest.TestCase):
         self.assertEqual(probe(bytes(a)).status,5)
     def test_overlay(self):self.assertNotEqual(probe(z()+b"tail").status,0)
     def test_absence(self):self.assertEqual(probe(b"").status,1)
+    def test_duplicate_manifest_is_ambiguous(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            self.assertEqual(probe(z(("AndroidManifest.xml", "AndroidManifest.xml"))).status, 9)
+
+    def test_duplicate_main_dex_is_ambiguous(self):
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            self.assertEqual(probe(z(("AndroidManifest.xml", "classes.dex", "classes.dex"))).status, 9)
+
+    def test_noncritical_repeated_names_remain_structural_only(self):
+        # A deliberately narrow contract: this does not claim generic ZIP uniqueness.
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", UserWarning)
+            self.assertEqual(probe(z(("AndroidManifest.xml", "a.txt", "a.txt"))).status, 0)
+
 class ToyBoot(unittest.TestCase):
     def test_bytecode(self):
         r=vm(bytes([0x10,7,0x11,5,0x31,0]))

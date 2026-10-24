@@ -79,3 +79,18 @@ Block promotion while independent review, file-level rights, real APK
 consumer/build proof, signatures, provider enforcement or physical targets
 remain TOKEN_VAZIO. A draft PR must not be merged merely because compilation
 passes. Rollback: close the draft PR; main remains untouched.
+
+## 2026-10-24 ambiguity falsifier (source-only delta)
+
+This bounded L0 subset explicitly returns `RA_AMBIGUOUS_CRITICAL=9` if a ZIP
+central directory contains more than one exact root `AndroidManifest.xml` or
+`classes.dex` entry. Unknown/unsupported data and ambiguity must not be
+promoted to a trusted installable APK. This **does not** authenticate ZIP
+contents, detect duplicate arbitrary paths, inspect DEX, verify CRC/decompress,
+check arbitrary aliasing/overlaps or replace `apksigner`.
+
+Reproducibility at the candidate source: 19 historical host tests remained
+PASS; three additional ambiguity boundary tests PASS (22/22), using the
+existing freestanding Clang compilation for x86_64, ARMv7 and AArch64 with
+zero undefined object symbols. Local software evidence is distinct from an
+exact PR-head GitHub Actions receipt or physical Android execution.
