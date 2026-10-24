@@ -6,7 +6,7 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 _Static_assert(sizeof(u8)==1 && sizeof(u16)==2 && sizeof(u32)==4,"8/16/32-bit target");
 enum {RA_OK_STRUCTURAL=0,RA_TRUNCATED=1,RA_NOT_ZIP=2,RA_UNSUPPORTED=3,
-      RA_DIRECTORY=4,RA_ENTRY=5,RA_NO_MANIFEST=6,RA_UNSAFE_PATH=7,RA_TOO_MANY=8};
+      RA_DIRECTORY=4,RA_ENTRY=5,RA_NO_MANIFEST=6,RA_UNSAFE_PATH=7,RA_TOO_MANY=8,RA_AMBIGUOUS_CRITICAL=9};
 typedef struct {u32 status, entries, manifest_present, dex_present;} ra_apk_result;
 static u16 r16(const u8 *p){return (u16)((u32)p[0]|((u32)p[1]<<8));}
 static u32 r32(const u8 *p){return (u32)p[0]|((u32)p[1]<<8)|((u32)p[2]<<16)|((u32)p[3]<<24);}
@@ -57,8 +57,17 @@ ra_apk_result ra_apk_probe(const u8 *b,u32 len){
   if(ln!=n||!span(cd,loc,30u+n+le)||!span(cd,loc+30u+n+le,packed))
    return out(RA_ENTRY,i,m,d);
   for(j=0;j<n;j++)if(b[loc+30+j]!=q[j])return out(RA_ENTRY,i,m,d);
-  if(n==19u&&eq(q,"AndroidManifest.xml",n))m=1;
-  if(n==11u&&eq(q,"classes.dex",n))d=1;
+  /* A ZIP may contain repeated names; Android critical entry ambiguity is unsafe.
+   * Reject a second central-directory declaration for these exact root names.
+   * This is not a signature, CRC, alias or decompression check. */
+  if(n==19u&&eq(q,"AndroidManifest.xml",n)){
+   if(m)return out(RA_AMBIGUOUS_CRITICAL,i,m,d);
+   m=1;
+  }
+  if(n==11u&&eq(q,"classes.dex",n)){
+   if(d)return out(RA_AMBIGUOUS_CRITICAL,i,m,d);
+   d=1;
+  }
   off+=rec;
  }
  if(off!=e)return out(RA_DIRECTORY,count,m,d);
