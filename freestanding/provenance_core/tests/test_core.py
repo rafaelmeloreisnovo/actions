@@ -68,6 +68,34 @@ class ProvenanceCoreTests(unittest.TestCase):
         self.api(None, ctypes.byref(output))
         self.assertEqual((output.state, output.release_authorized), (0, 0))
 
+    def test_truth_table_all_claim_vectors(self):
+        # 2 valid origins x 128 proof combinations = 256 modeled states.
+        for origin in (1, 2):
+            for claims in range(128):
+                with self.subTest(origin=origin, claims=claims):
+                    out = self.evaluate(origin, claims)
+                    rights = 31 & ~claims
+                    evidence = 96 & ~claims
+                    expected = 2 if rights else (3 if evidence else 4)
+                    self.assertEqual((out.state, out.missing_rights,
+                                      out.missing_evidence, out.release_authorized),
+                                     (expected, rights, evidence, 0))
+        # Every unauthorized proof bit is rejected independently.
+        for bit in range(7, 32):
+            self.assertEqual(self.evaluate(2, 127 | (1 << bit)).state, 1)
+
+    def test_overlapping_input_output_and_boundaries(self):
+        # A caller may reuse an aligned output storage allocation as input.
+        out = Decision(2, 127, 42, 42)
+        request = ctypes.cast(ctypes.byref(out), ctypes.POINTER(Request))
+        self.api(request, ctypes.byref(out))
+        self.assertEqual((out.state, out.missing_rights,
+                          out.missing_evidence, out.release_authorized), (4, 0, 0, 0))
+        self.api(None, None)
+        # A null result is a no-op even when the input pointer is invalid.
+        invalid = ctypes.cast(ctypes.c_void_p(1), ctypes.POINTER(Request))
+        self.api(invalid, None)
+
     def test_cross_target_objects_no_undefined_symbols(self):
         targets = ("x86_64-unknown-none-elf", "armv7-none-eabi", "aarch64-none-elf")
         for target in targets:

@@ -3,6 +3,10 @@ set -euo pipefail
 
 SOURCES="${1:-evidence-registry/sources.tsv}"
 OUT="${2:-evidence-artifact}"
+# Explicit HTTPS-only, known-host egress contract; no follow-up redirects.
+HOSTS="${RA_HOSTS_FILE:-evidence-registry/allowed_hosts.v1.txt}"
+test -r "$HOSTS" || { echo "FAIL: missing approved host policy" >&2; exit 2; }
+export LC_ALL=C
 RUN_KEY="${GITHUB_RUN_ID:-local}-${GITHUB_RUN_ATTEMPT:-1}-$(date -u +%Y%m%dT%H%M%SZ)"
 RUN_DIR="$OUT/runs/$RUN_KEY"
 RAW_DIR="$RUN_DIR/raw"
@@ -22,19 +26,39 @@ json_line() {
     '{provider:$provider,source_class:$source_class,source_url:$source_url,retrieved_at_utc:$retrieved_at,http_status:$http_status,content_type:$content_type,effective_url:$effective_url,response_date:$response_date,last_modified:$last_modified,etag:$etag,sha256:$sha256,raw_artifact:$artifact,error:$error,source_declared_date:"TOKEN_VAZIO",source_declared_time:"TOKEN_VAZIO",claim_allowed:false}'
 }
 
-while IFS=$'\t' read -r provider source_class url; do
+approved_url() {
+  local url=$1 host
+  [[ "$url" == https://* ]] || return 1
+  host=${url#https://}
+  host=${host%%/*}
+  host=${host%%\?*}
+  # Literal host equality: rejects userinfo, arbitrary ports and numeric IPs.
+  grep -Fqx -- "$host" "$HOSTS"
+}
+
+while IFS="$(printf '\t')" read -r provider source_class url; do
   [[ -z "${provider:-}" ]] && continue
   [[ "${provider:0:1}" == "#" ]] && continue
   [[ -z "${url:-}" ]] && continue
 
   retrieved="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+  if ! approved_url "$url"; then
+    json_line "$provider" "$source_class" "$url" "$retrieved" \
+      "TOKEN_VAZIO" "TOKEN_VAZIO" "TOKEN_VAZIO" \
+      "TOKEN_VAZIO" "TOKEN_VAZIO" "TOKEN_VAZIO" \
+      "TOKEN_VAZIO" "TOKEN_VAZIO" "DENIED_URL_BY_HOST_OR_SCHEME_POLICY" >> "$LEDGER"
+    continue
+  fi
   key="$(printf '%s' "$url" | sha256sum | awk '{print $1}')"
   body="$RAW_DIR/${key}.body"
   headers="$HDR_DIR/${key}.headers"
   err="$RUN_DIR/${key}.stderr"
 
   set +e
-  meta="$(curl -L --compressed --max-time 60 --retry 2 --retry-delay 2 \
+  # No auto-redirect: an HTTPS allowlisted host may point at a forbidden IP.
+  meta="$(curl --proto '=https' --proto-redir '=https' \
+    --compressed --max-filesize 10485760 --connect-timeout 10 \
+    --max-time 60 --retry 1 --retry-delay 2 \
     -A 'EvidenceRegistry/1.0 (+GitHub Actions public-source archival)' \
     -D "$headers" -o "$body" \
     -w '%{http_code}\t%{content_type}\t%{url_effective}' \
@@ -53,6 +77,8 @@ while IFS=$'\t' read -r provider source_class url; do
   error=""
   if [[ $rc -ne 0 ]]; then
     error="curl_exit_$rc: $(tr '\n' ' ' < "$err" | head -c 800)"
+  elif [[ "$http_status" != 200 ]]; then
+    error="HTTP_${http_status}_NOT_ACCEPTED_NO_REDIRECT"
   fi
 
   json_line "$provider" "$source_class" "$url" "$retrieved" "${http_status:-TOKEN_VAZIO}" \

@@ -109,3 +109,7 @@ See the [full action documentation](docs/wrapper-validation.md) for more advance
 ## Fork-local RAFAELIA authorship and credits
 
 This repository is a fork of **Gradle Actions**. Its original Gradle implementation, documentation, license and contributor credits remain third-party. For local additions, provenance, original C research cores and outstanding rights gates, use [AUTHORSHIP_AND_CREDITS.md](AUTHORSHIP_AND_CREDITS.md), [the machine-readable origin map](provenance/lineage.v1.json) and [START_HERE_RAFAELIA.md](START_HERE_RAFAELIA.md). Local source is **not** a replacement for upstream Gradle Actions or evidence of whole-fork authorship. Any proprietary vendor component must be audited at the actual source revision before redistribution.
+
+## RAFAELIA operational risk route — 2026-10-24
+
+Source/test-only follow-up (no upstream runtime rewriting): [scoped engineering risk ledger](governance/RISK_REGISTER_20261024.md) tracks exact-HEAD checkout, Ω-OS ABI test mirror, new freestanding source falsifiers and typed provider/rights/hardware gaps. This is a proposal on a feature branch, not release authorization.

@@ -23,3 +23,7 @@ Eight hosted unit test methods cover unknown origins, invalid flags, missing cre
 This code was authored for the user's requested separate local RAFAELIA lane on 2026-10-24. See `AUTHORSHIP_AND_CREDITS.md` and `provenance/lineage.v1.json` for repository boundaries and unresolved holder/grant checks. Separate proprietary upstream content must never be recharacterized as original. Relocating into a dedicated RAFAELIA producer repository is a future reviewed change.
 
 R3 = <F_ok: isolated source + falsifiers, F_gap: human attestation/license/per-file lineage/exact-head CI/independent review, F_next: exact-head hosted gate and file-level legal audit>.
+
+## Follow-up hardening (2026-10-24)
+
+Input/receipt buffer overlap is supported by snapshotting two words before any output write. This changes only the deterministic interpretation of a shared caller buffer, not the release barrier. Ten hosted Python test methods include a 256-case claim truth table, 25 invalid high-bit masks, null and alias fixtures; a separate host-only C falsifier runs under AddressSanitizer/UBSan. None of these prove a copyright entitlement or executable physical ARM behavior. For wider risk controls see `../../governance/RISK_REGISTER_20261024.md`.
