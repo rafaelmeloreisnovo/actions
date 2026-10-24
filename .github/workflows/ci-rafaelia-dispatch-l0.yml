@@ -1,0 +1,46 @@
+# RAFAELIA proposed additive PR-only CI for isolated L0. Hosted orchestration is not freestanding.
+name: dispatch-l0 source-bound gate
+on:
+  pull_request:
+    paths:
+      - 'freestanding/dispatch_l0/**'
+      - '.github/workflows/ci-rafaelia-dispatch-l0.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freestanding/dispatch_l0/**'
+      - '.github/workflows/ci-rafaelia-dispatch-l0.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: dispatch-l0-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  scoped-verify:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout exact immutable HEAD without third-party Action
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]] || exit 2
+          git init -q .
+          git remote add origin "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+          git -c protocol.version=2 fetch --no-tags --depth=1 origin "$SOURCE_SHA"
+          git checkout -q --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          printf 'checked_source_sha=%s\n' "$SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+      - name: Hosted C tests and freestanding cross-object verification
+        shell: bash
+        env:
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          sh freestanding/dispatch_l0/tests/verify.sh
+          echo 'scope=HOSTED_SOURCE_AND_OBJECT_TEST_ONLY' >> "$GITHUB_STEP_SUMMARY"
+          echo 'physical_execution=NOT_RUN; independent_review=TOKEN_VAZIO; claim_allowed=false' >> "$GITHUB_STEP_SUMMARY"
