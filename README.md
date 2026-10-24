@@ -103,3 +103,9 @@ jobs:
 ```
 
 See the [full action documentation](docs/wrapper-validation.md) for more advanced usage scenarios.
+
+---
+
+## Fork-local RAFAELIA authorship and credits
+
+This repository is a fork of **Gradle Actions**. Its original Gradle implementation, documentation, license and contributor credits remain third-party. For local additions, provenance, original C research cores and outstanding rights gates, use [AUTHORSHIP_AND_CREDITS.md](AUTHORSHIP_AND_CREDITS.md), [the machine-readable origin map](provenance/lineage.v1.json) and [START_HERE_RAFAELIA.md](START_HERE_RAFAELIA.md). Local source is **not** a replacement for upstream Gradle Actions or evidence of whole-fork authorship. Any proprietary vendor component must be audited at the actual source revision before redistribution.

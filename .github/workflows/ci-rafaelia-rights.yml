@@ -1,0 +1,47 @@
+# RAFAELIA-local test lane; not an upstream Gradle Actions workflow.
+# Exact source SHA, least privilege, scoped tests; no release or protected branch change.
+name: RAFAELIA original rights-core / scoped host checks
+
+on:
+  pull_request:
+    paths:
+      - 'freestanding/provenance_core/**'
+      - 'provenance/**'
+      - 'AUTHORSHIP_AND_CREDITS.md'
+      - '.github/workflows/ci-rafaelia-rights.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'freestanding/provenance_core/**'
+      - 'provenance/**'
+      - 'AUTHORSHIP_AND_CREDITS.md'
+      - '.github/workflows/ci-rafaelia-rights.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  rights-host:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 6
+    steps:
+      - name: Checkout immutable candidate revision
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - name: Run bounded negative gates
+        shell: bash
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+          python3 -m json.tool provenance/lineage.v1.json >/dev/null
+          python3 -m unittest discover -s freestanding/provenance_core/tests -p 'test_*.py' -v
+          {
+            echo '### RAFAELIA rights-core: hosted scoped checks'
+            echo "Source HEAD: $EXPECTED_SOURCE_SHA"
+            echo 'No legal clearance, no code-originality certification, no physical ARM execution.'
+            echo 'Release authorization: BLOCKED.'
+          } >> "$GITHUB_STEP_SUMMARY"

@@ -76,3 +76,8 @@ LOCAL_KERNEL4_SEPARATE_LICENSE = TOKEN_VAZIO
 ```
 
 R3=<F_ok: inherited Gradle route, local Kernel4 route and rights boundary are separated, F_gap: physical/hardware/glyph evidence plus separate local-delta license remain TOKEN_VAZIO, F_next: keep runtime work separate; resolve rights only by explicit file-level decision and physical claims only by exact-artifact receipts>
+
+
+## 2026-10-24 authorial provenance lane — DRAFT ONLY
+
+For origin credits and navigable locations, route to `AUTHORSHIP_AND_CREDITS.md`; for type-annotated folder scopes, `provenance/lineage.v1.json`; for an independent freestanding structural gate and negative tests, `freestanding/provenance_core/README.md`. No upstream code replaced. No promotion or release permission inherited from a local test. Mixed `.github/` files require per-file provenance audit. Rollback: close this draft PR without modifying `main`.

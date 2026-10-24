@@ -1,0 +1,99 @@
+{
+  "schema": "rafaelia.actions.file-origin-map/v1",
+  "observed_at": "2026-10-24",
+  "repository": "rafaelmeloreisnovo/actions",
+  "base_commit": "cb75737a66ec13bc44cb004c920025603e97b550",
+  "upstream": "https://github.com/gradle/actions",
+  "fork_license_path": "LICENSE",
+  "ownership_claim_for_whole_repo": false,
+  "claimed_grants_are_independent_evidence": false,
+  "release_allowed": false,
+  "upstream_comparison": "TOKEN_VAZIO_FORK_POINT_AND_VERSIONED_COMPONENT_CENSUS",
+  "current_upstream_observation": "Gradle upstream currently lists an exception for gradle-actions-caching; do not assume this version of the fork includes it.",
+  "records": [
+    {
+      "path": "LICENSE",
+      "kind": "INHERITED_NOTICE",
+      "source": "gradle/actions",
+      "rights": "MIT notice in this fork; applicability to all bundled components not independently cleared"
+    },
+    {
+      "path": "setup-gradle/**",
+      "kind": "INHERITED_CANDIDATE",
+      "source": "gradle/actions",
+      "rights": "File-level audit required; do not claim RAFAELIA authorship"
+    },
+    {
+      "path": "dependency-submission/**",
+      "kind": "INHERITED_CANDIDATE",
+      "source": "gradle/actions",
+      "rights": "File-level audit required"
+    },
+    {
+      "path": "wrapper-validation/**",
+      "kind": "INHERITED_CANDIDATE",
+      "source": "gradle/actions",
+      "rights": "File-level audit required"
+    },
+    {
+      "path": "sources/**",
+      "kind": "INHERITED_CANDIDATE",
+      "source": "gradle/actions",
+      "rights": "File-level audit required"
+    },
+    {
+      "path": "dist/**",
+      "kind": "INHERITED_BUNDLED_CANDIDATE",
+      "source": "gradle/actions and bundled transitive components",
+      "rights": "Component-by-component license/notice verification required"
+    },
+    {
+      "path": ".github/**",
+      "kind": "MIXED_UNRESOLVED",
+      "source": "gradle/actions + local changes",
+      "rights": "Resolve every local workflow separately"
+    },
+    {
+      "path": "freestanding/kernel4/**",
+      "kind": "LOCAL_DELTA_CANDIDATE",
+      "source": "local git history PR #3",
+      "rights": "Separate holder and local grant: TOKEN_VAZIO"
+    },
+    {
+      "path": "freestanding/omega_os/**",
+      "kind": "LOCAL_DELTA_CANDIDATE",
+      "source": "local git history PR #7",
+      "rights": "Separate holder and local grant: TOKEN_VAZIO"
+    },
+    {
+      "path": "freestanding/apk_bridge/**",
+      "kind": "LOCAL_DELTA_CANDIDATE",
+      "source": "local git history PR #6",
+      "rights": "Separate holder and local grant: TOKEN_VAZIO"
+    },
+    {
+      "path": "rafcode/l0/**",
+      "kind": "LOCAL_DELTA_CANDIDATE",
+      "source": "local git history (commit-level audit pending)",
+      "rights": "Separate holder and local grant: TOKEN_VAZIO"
+    },
+    {
+      "path": "composition/**",
+      "kind": "LOCAL_DELTA_CANDIDATE",
+      "source": "local git history PR #8",
+      "rights": "Separate holder and local grant: TOKEN_VAZIO"
+    },
+    {
+      "path": "freestanding/provenance_core/**",
+      "kind": "NEW_SEPARATE_LOCAL",
+      "source": "this draft PR, parent cb75737a66ec13bc44cb004c920025603e97b550",
+      "rights": "No inherited Gradle expression used; external legal originality review and separate grant still required"
+    },
+    {
+      "path": "provenance/**",
+      "kind": "NEW_SEPARATE_LOCAL",
+      "source": "this draft PR, parent cb75737a66ec13bc44cb004c920025603e97b550",
+      "rights": "Metadata, not a certificate"
+    }
+  ]
+}
