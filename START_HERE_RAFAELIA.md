@@ -86,3 +86,8 @@ For origin credits and navigable locations, route to `AUTHORSHIP_AND_CREDITS.md`
 ## 2026-10-24 — rota documental candidata Dispatch L0 (PR #16; NÃO PROMOVER)
 
 Para pessoas e agentes de software: [INSECTION / índice Dispatch L0](freestanding/dispatch_l0/INDEX.md) → [guia ligado ao código](freestanding/dispatch_l0/docs/CODE_GUIDE.md) → [gates e riscos](freestanding/dispatch_l0/docs/GATES_AND_RELATIONS.md) → [índice JSON de nós](freestanding/dispatch_l0/navigation.v1.json). O caminho apontado é um **adendo DRAFT**, e não software implantado; código herdado Gradle, Kernel4 e os demais produtores não são substituídos. `rd_plan` só planeja, nenhum hardware é ativado; `claim_allowed=false` e autorização de merge permanecem negadas até evidência independente.
+
+
+## 2026-10-24 — CI source identity adapter
+
+[Exact source gate](rafcode/verify-source/README.md) binds Termux consumer tests to a full commit SHA and clean tracked checkout. Hosted Bash/Git boundary; no Node, runtime or promotion claim.
