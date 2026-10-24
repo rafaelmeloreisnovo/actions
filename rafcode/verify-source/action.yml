@@ -1,0 +1,19 @@
+name: Verify exact source checkout
+description: Bind a clean tracked checkout to an expected full commit SHA before tests.
+inputs:
+  expected-sha:
+    description: Full 40-character lowercase commit SHA selected by the caller.
+    required: true
+outputs:
+  source-sha:
+    description: Verified source commit; emitted only after all checks pass.
+    value: ${{ steps.verify.outputs.source-sha }}
+runs:
+  using: composite
+  steps:
+    - id: verify
+      shell: bash
+      env:
+        RAF_EXPECTED_SHA: ${{ inputs.expected-sha }}
+        RAF_SOURCE_GATE: ${{ github.action_path }}
+      run: bash "$RAF_SOURCE_GATE/verify.sh"
