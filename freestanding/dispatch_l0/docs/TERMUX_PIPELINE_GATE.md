@@ -29,3 +29,7 @@ L0 capabilities `scalar/NEON/SIMD/GPU` are caller assertions, not hardware obser
 Acceptance for this delta: workflow parses; `verify-source` passes on the exact HEAD before the preexisting L0 tests; tests still pass; no changes to root Gradle action, production code, licenses, signatures or runtime. On any source mismatch, exit nonzero. A passing CI gate cannot override a missing manual approval, insecure provider rulesets or failed physical device evidence.
 
 Rollback: revert only the additive workflow step on a separate guarded commit; preserve this branch and all predecessor refs. `claim_allowed=false`; `promotion=HOLD`.
+
+## Targeted research pointers (not implementation evidence)
+
+For future *separately authorized* work only, alphaXiv discovery returned [WarpGuard: Towards Control-Flow Attestation for Heterogeneous CPU-GPU Execution](https://www.alphaxiv.org/abs/2607.13640) and [BitIR: Cross-Architecture Fault Injection for Resilience Analysis of Heterogeneous GPU Applications](https://www.alphaxiv.org/abs/2610.04037). They suggest independent assessment dimensions for GPU/CPU attestation and multi-architecture fault-injection; their methods are NOT imported here, and no GPU driver, firmware, attestation or benchmark is implemented by this PR. Papers remain third-party literature under original rights, not RAFAELIA authorship.
