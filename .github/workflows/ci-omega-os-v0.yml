@@ -94,4 +94,14 @@ jobs:
             freestanding/omega_os/tests/fuzz_host.c -o /tmp/omega_fuzz
           ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
             UBSAN_OPTIONS=halt_on_error=1 /tmp/omega_fuzz
+          # Independently enumerate 126,720 bounded events over 5 reachable
+          # seed states and replay each call. C harness uses hosted libc only.
+          clang -std=c11 -O1 -g -fsanitize=address,undefined \
+            -fno-omit-frame-pointer -Wall -Wextra -Werror \
+            freestanding/omega_os/omega_core.c \
+            freestanding/omega_os/tests/exhaustive_host.c -o /tmp/omega_exhaustive
+          ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
+            UBSAN_OPTIONS=halt_on_error=1 /tmp/omega_exhaustive
+          echo "source_head=$EXPECTED" >> "$GITHUB_STEP_SUMMARY"
+          echo 'scope=126720_HOST_MODEL_CASES_NO_BOOT_NO_HARDWARE' >> "$GITHUB_STEP_SUMMARY"
           echo 'SCOPE=HOST_SYNTHETIC_ONLY_NO_BOOT_NO_HARDWARE'
