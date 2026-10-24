@@ -33,3 +33,9 @@ Mapping is **informative**, not an ISO/NIST certification: NIST SP 800-218 PO/PS
 First close R-001/R-002 by source-bound CI; then audit R-006/R-007 as separate work without changing upstream runtime. A hosted sanitizer PASS does not authorize release/merge, hardware boot or legal claims.
 
 R3 = <F_ok: 3 local bugs and checks typed, F_gap: hosted Actions/provider/reviewer/hardware evidence unresolved, F_next: exact-HEAD CI and least-privilege review>.
+
+### Versioned standards refresh — 2026-10-24 (informative)
+
+The current edition is ISO 9001:2026 (ISO published 16 September 2026), replacing ISO 9001:2015; see https://www.iso.org/quality-management/iso-9001-2026 . Use it as guidance for documented risks, opportunities and continuous improvement, not as a certification. NIST SSDF: https://csrc.nist.gov/pubs/sp/800/218/final and ISO/IEC 27001:2022: https://www.iso.org/standard/27001 . ISO 8000 is a multi-part data-quality family; exact part/applicability remains TOKEN_VAZIO rather than presuming a single applicable normative clause. DMAIC and PDCA are complementary improvement cycles, not a proof of a statistical Six Sigma level.
+
+**New discovered regression closure**: R-003-A: rights-core output null guard must precede any input dereference, including an intentionally invalid input pointer. Local host test with a non-dereferenceable input and null result PASS on candidate source. Explicitly keep `claim_allowed=false` and re-run exact-head provider tests after this commit.

@@ -13,12 +13,12 @@ void ra_provenance_check(const ra_provenance_input *input,
      * This requires only two registers; no heap, memcpy, or runtime helper. */
     ra_word observed_origin = RA_ORIGIN_UNRESOLVED;
     ra_word observed_claims = 0u;
+    /* A null output must not cause even an input dereference. */
+    if (result == (ra_provenance_result *)0) return;
     if (input != (const ra_provenance_input *)0) {
         observed_origin = input->origin;
         observed_claims = input->claimed_proofs;
     }
-    /* The absent output pointer cannot be written; no side effects exist. */
-    if (result == (ra_provenance_result *)0) return;
 
     /* Deterministically initialize every output before reading untrusted data. */
     result->state = RA_STATE_UNKNOWN;

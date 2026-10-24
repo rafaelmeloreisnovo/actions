@@ -92,6 +92,9 @@ class ProvenanceCoreTests(unittest.TestCase):
         self.assertEqual((out.state, out.missing_rights,
                           out.missing_evidence, out.release_authorized), (4, 0, 0, 0))
         self.api(None, None)
+        # A null result is a no-op even when the input pointer is invalid.
+        invalid = ctypes.cast(ctypes.c_void_p(1), ctypes.POINTER(Request))
+        self.api(invalid, None)
 
     def test_cross_target_objects_no_undefined_symbols(self):
         targets = ("x86_64-unknown-none-elf", "armv7-none-eabi", "aarch64-none-elf")
