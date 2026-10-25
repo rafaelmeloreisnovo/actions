@@ -26,7 +26,7 @@ class SourceGateTests(unittest.TestCase):
                               text=True, capture_output=True)
 
     def run_gate(self, sha, *, cwd=None):
-        output = self.root / "gate-output"
+        output = self.root / ".git" / "gate-output"
         output.write_text("")
         env = dict(os.environ, RAF_EXPECTED_SHA=sha, GITHUB_OUTPUT=str(output))
         run = subprocess.run(["bash", str(SCRIPT)], cwd=cwd or self.root,
@@ -77,6 +77,16 @@ class SourceGateTests(unittest.TestCase):
         self.reject(self.sha, "source_sha_mismatch")
         run, _ = self.run_gate(self.git("rev-parse", "HEAD").stdout.strip())
         self.assertEqual(run.returncode, 0, run.stderr)
+
+
+    def test_untracked_code_is_rejected(self):
+        (self.root / "rogue.c").write_text("void rogue(void) {}\n")
+        (self.root / "rogue.h").write_text("#define ROGUE 1\n")
+        self.reject(self.sha, "untracked_build_input")
+
+    def test_untracked_newline_name_is_rejected(self):
+        (self.root / "newline\nheader.h").write_text("#define X 1\n")
+        self.reject(self.sha, "untracked_build_input")
 
 
 if __name__ == "__main__":

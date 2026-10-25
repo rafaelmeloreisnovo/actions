@@ -9,6 +9,11 @@ actual=$(git rev-parse --verify HEAD) || fail missing_git_head
 git diff --quiet --ignore-submodules=none -- || fail modified_worktree
 git diff --cached --quiet --ignore-submodules=none -- || fail modified_index
 
+# Untracked, non-ignored files could be consumed by a later compiler invocation.
+# core.quotePath=true ensures unusual names (including newlines) remain observable.
+untracked=$(git -c core.quotePath=true ls-files --others --exclude-standard) || fail untracked_enumeration
+[[ -z "$untracked" ]] || fail untracked_build_input
+
 # This gate covers tracked source at this instant, not later build mutations,
 # ignored/untracked files, signatures, test results, runtime or authorization.
 if [[ -n ${GITHUB_OUTPUT:-} ]]; then
