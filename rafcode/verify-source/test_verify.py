@@ -89,5 +89,23 @@ class SourceGateTests(unittest.TestCase):
         self.reject(self.sha, "untracked_build_input")
 
 
+    def test_ignored_header_rejected(self):
+        (self.root / ".gitignore").write_text("*.h\n")
+        self.git("add", ".gitignore")
+        self.git("commit", "-qm", "ignore headers")
+        self.sha = self.git("rev-parse", "HEAD").stdout.strip()
+        (self.root / "rogue.h").write_text("#define ROGUE 1\n")
+        self.reject(self.sha, "ignored_build_input")
+
+    def test_ignored_directory_rejected(self):
+        (self.root / ".gitignore").write_text("build/\n")
+        self.git("add", ".gitignore")
+        self.git("commit", "-qm", "ignore build")
+        self.sha = self.git("rev-parse", "HEAD").stdout.strip()
+        (self.root / "build").mkdir()
+        (self.root / "build" / "rogue.c").write_text("void rogue(void) {}\n")
+        self.reject(self.sha, "ignored_build_input")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
