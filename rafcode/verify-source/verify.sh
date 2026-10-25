@@ -14,8 +14,14 @@ git diff --cached --quiet --ignore-submodules=none -- || fail modified_index
 untracked=$(git -c core.quotePath=true ls-files --others --exclude-standard) || fail untracked_enumeration
 [[ -z "$untracked" ]] || fail untracked_build_input
 
-# This gate covers tracked source at this instant, not later build mutations,
-# ignored/untracked files, signatures, test results, runtime or authorization.
+# An ignored file can still be consumed by a build through include paths,
+# globs or implicit tool discovery. On a fresh checkout, fail closed on any
+# ignored build input; never mistake .gitignore for a security boundary.
+ignored=$(git -c core.quotePath=true ls-files --others --ignored --exclude-standard) || fail ignored_enumeration
+[[ -z "$ignored" ]] || fail ignored_build_input
+
+# This gate proves only the clean pre-build checkout at this instant.
+# Later build mutations, signatures, test results and runtime are not covered.
 if [[ -n ${GITHUB_OUTPUT:-} ]]; then
     printf 'source-sha=%s\n' "$actual" >> "$GITHUB_OUTPUT"
 fi
