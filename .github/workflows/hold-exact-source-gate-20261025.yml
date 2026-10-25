@@ -1,0 +1,44 @@
+# Candidate-only source assurance; does not promote, publish, merge or deploy.
+name: HOLD exact source gate (isolated)
+on:
+  push:
+    branches:
+      - 'hold/verify-source-ignored-inputs-20261024'
+    paths:
+      - 'rafcode/verify-source/**'
+      - '.github/workflows/hold-exact-source-gate-20261025.yml'
+permissions:
+  contents: read
+concurrency:
+  group: hold-source-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  candidate-host:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout immutable candidate
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Reject modified untracked or ignored checkout inputs
+        uses: ./rafcode/verify-source
+        with:
+          expected-sha: ${{ github.sha }}
+      - name: Negative regression suite
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash -n rafcode/verify-source/verify.sh
+          python3 -m py_compile rafcode/verify-source/test_verify.py
+          python3 rafcode/verify-source/test_verify.py
+      - name: Scope boundary
+        run: |
+          {
+            echo "SOURCE_COMMIT=${GITHUB_SHA}"
+            echo "SCOPE=EXACT_SHA_HOST_TESTS_ONLY"
+            echo "PHYSICAL_DEVICE=NOT_RUN"
+            echo "APT=NOT_RUN"
+            echo "CLAIM_ALLOWED=false"
+          } >> "$GITHUB_STEP_SUMMARY"
