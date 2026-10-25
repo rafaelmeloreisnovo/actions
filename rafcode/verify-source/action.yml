@@ -1,5 +1,5 @@
 name: Verify exact source checkout
-description: Bind a clean tracked checkout to an expected full commit SHA before tests.
+description: Bind a clean pre-build checkout (tracked, untracked and ignored inputs) to an exact source SHA.
 inputs:
   expected-sha:
     description: Full 40-character lowercase commit SHA selected by the caller.
