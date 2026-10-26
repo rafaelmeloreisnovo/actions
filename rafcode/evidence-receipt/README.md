@@ -24,3 +24,15 @@ The receipt binds `source_commit_sha + GITHUB_RUN_ID + GITHUB_RUN_ATTEMPT + arti
 Run metadata comes from runner environment, not signed GitHub attestation; job/run can still fail after this action. A SHA-256 digest proves local byte identity only, not execution on a physical device, original authorship, source-truth or scientific reproducibility. A shell script can lie or be malicious; source review, independent negative controls, exact HEAD, protected branches, licensed rights and external reviewer remain separate gates. Test fixture only: `python3 rafcode/evidence-receipt/test_receipt.py`. No external package install required (system Bash/Git/Python3 provided by hosted runner).
 
 **Security:** denies path traversal, parent symlinks, absent/empty/oversized files, invalid IDs, mismatched SHA, dirty tracked files, failed falsifiers and output mutation. SHA1 may appear in Git object internals; **do not use Git SHA1 as modern cryptographic authentication**. No release/promotion implied. Never delete upstream and retain a scoped rollback path.
+
+## Completed-provider audit (read only)
+
+A second, independently callable tool `provider_verify.py` audits a *completed* GitHub run against a saved provisional receipt:
+
+```sh
+python3 rafcode/evidence-receipt/provider_verify.py /path/to/reviewed-receipt.json
+```
+
+It recomputes the canonical receipt digest and checks the GitHub provider's `run_id`, exact `head_sha`, `run_attempt`, terminal success, one completed successful Action step, the Git object SHA-1 and source SHA-256 of the **tracked artifact and falsifier script**, all from the original exact commit. The result is `SUCCESS_VERIFIED_SCOPED`, with independent human review still NOT_RUN, claim_allowed=false, promotion=HOLD. This is not a signature or certification; it does not prove APK installation, math scientific validity or source ownership.
+
+Boundaries: the current provider auditor supports **tracked public-source files up to 1 MiB**, not uploaded binary APK archives, private repositories, arbitrary external URLs or physical devices. It never writes provider data; it fails closed on source drift, missing run/job, bad hashes and non-success runs. Negative cases live in `test_provider_verify.py`. Exact output depends on GitHub API state and immutable SHA; a review of rights/security and external artifact hashes remains a separate gate. No upstream Gradle code or notices were modified.
