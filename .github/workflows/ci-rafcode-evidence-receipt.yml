@@ -29,6 +29,8 @@ jobs:
           set -euo pipefail
           python3 -m unittest discover -s rafcode/evidence-receipt -p "test_receipt.py" -v
           python3 -m py_compile rafcode/evidence-receipt/issue_receipt.py
+          python3 -m unittest discover -s rafcode/evidence-receipt -p "test_provider_verify.py" -v
+          python3 -m py_compile rafcode/evidence-receipt/provider_verify.py
       - name: Self-receipt on owned source
         uses: ./rafcode/evidence-receipt
         with:
