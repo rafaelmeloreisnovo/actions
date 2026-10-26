@@ -1,20 +1,12 @@
-# RAFAELIA first-party documentary claim check only, not ISO/NIST certification.
+# RAFAELIA scope: document-policy check. This workflow does NOT certify ISO/NIST compliance.
+# Run on every pull request to avoid path-based false absence of a policy check.
 name: RAFAELIA documentary normative claim guard
 
 on:
   pull_request:
-    paths:
-      - 'governance/normative_claim_state.v1.json'
-      - 'governance/NORMATIVE_CLAIM_POLICY_V1.md'
-      - 'governance/tests/test_normative_claims.py'
-      - '.github/workflows/ci-rafaelia-normative-claims.yml'
   push:
     branches: [main]
-    paths:
-      - 'governance/normative_claim_state.v1.json'
-      - 'governance/NORMATIVE_CLAIM_POLICY_V1.md'
-      - 'governance/tests/test_normative_claims.py'
-      - '.github/workflows/ci-rafaelia-normative-claims.yml'
+  workflow_dispatch:
 
 permissions:
   contents: read
@@ -24,18 +16,25 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - name: Exact source checkout without token persistence
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
         with:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 1
           persist-credentials: false
-      - name: Validate source SHA and fail-closed document policy
+      - name: Validate SHA and no-certification documentary gate
         shell: bash
         env:
           EXPECTED: ${{ github.event.pull_request.head.sha || github.sha }}
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$EXPECTED"
-          python3 -m json.tool governance/normative_claim_state.v1.json > /dev/null
+          python3 -m json.tool governance/normative_claim_state.v1.json >/dev/null
+          python3 governance/verify_normative_claims.py
           python3 -m unittest discover -s governance/tests -p 'test_*.py' -v
-          echo 'documentary gate only: ISO/NIST certification NOT CLAIMED' >> "$GITHUB_STEP_SUMMARY"
+          {
+            echo 'documentary policy only, not ISO/NIST certification or conformity assessment'
+            echo "source_sha=$EXPECTED"
+            echo 'certification_claim_allowed=false'
+            echo 'human_release_authority=REQUIRED'
+          } >> "$GITHUB_STEP_SUMMARY"
