@@ -1,0 +1,54 @@
+# Hosted-only verification. No claim of provider enforcement or certified compliance.
+name: RAFCODE source identity gate - scoped
+on:
+  pull_request:
+    paths:
+      - 'rafcode/verify-source/**'
+      - '.github/workflows/ci-rafcode-source-gate.yml'
+  push:
+    branches: [main]
+    paths:
+      - 'rafcode/verify-source/**'
+      - '.github/workflows/ci-rafcode-source-gate.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: rafcode-source-gate-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-gate-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout immutable source SHA without third-party action
+        shell: bash
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          [[ "$EXPECTED_SOURCE_SHA" =~ ^[0-9a-f]{40}$ ]] || exit 2
+          git init -q .
+          git remote add origin "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git"
+          git -c protocol.version=2 fetch --no-tags --depth=1 origin "$EXPECTED_SOURCE_SHA"
+          git checkout -q --detach FETCH_HEAD
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+      - name: Source and index unchanged before tests
+        shell: bash
+        env:
+          RAF_EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: bash rafcode/verify-source/verify.sh
+      - name: Run negative fixtures with no bytecode write
+        shell: bash
+        run: |
+          set -euo pipefail
+          PYTHONDONTWRITEBYTECODE=1 python3 -B -m unittest discover \
+            -s rafcode/verify-source -p 'test_verify.py' -v
+      - name: Source and index unchanged after tests
+        shell: bash
+        env:
+          RAF_EXPECTED_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          bash rafcode/verify-source/verify.sh
+          echo 'scope=HOSTED_SOURCE_TREE_ONLY; provider_enforcement=NOT_PROVEN; claim_allowed=false; promotion=HOLD' >> "$GITHUB_STEP_SUMMARY"

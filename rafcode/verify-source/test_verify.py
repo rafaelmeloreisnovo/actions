@@ -26,7 +26,7 @@ class SourceGateTests(unittest.TestCase):
                               text=True, capture_output=True)
 
     def run_gate(self, sha, *, cwd=None):
-        output = self.root / "gate-output"
+        output = self.root / ".git" / "gate-output"
         output.write_text("")
         env = dict(os.environ, RAF_EXPECTED_SHA=sha, GITHUB_OUTPUT=str(output))
         run = subprocess.run(["bash", str(SCRIPT)], cwd=cwd or self.root,
@@ -77,6 +77,59 @@ class SourceGateTests(unittest.TestCase):
         self.reject(self.sha, "source_sha_mismatch")
         run, _ = self.run_gate(self.git("rev-parse", "HEAD").stdout.strip())
         self.assertEqual(run.returncode, 0, run.stderr)
+
+
+    def test_untracked_code_is_rejected(self):
+        (self.root / "rogue.c").write_text("void rogue(void) {}\n")
+        (self.root / "rogue.h").write_text("#define ROGUE 1\n")
+        self.reject(self.sha, "untracked_build_input")
+
+    def test_untracked_newline_name_is_rejected(self):
+        (self.root / "newline\nheader.h").write_text("#define X 1\n")
+        self.reject(self.sha, "untracked_build_input")
+
+    def test_ignored_critical_source_is_rejected(self):
+        (self.root / ".gitignore").write_text("*.inc\n")
+        self.git("add", ".gitignore")
+        self.git("commit", "-qm", "fixture ignore policy")
+        sha = self.git("rev-parse", "HEAD").stdout.strip()
+        target = self.root / "freestanding" / "dispatch_l0"
+        target.mkdir(parents=True)
+        (target / "rogue.inc").write_text("ignored but build-relevant\n")
+        self.reject(sha, "ignored_critical_input")
+
+    def test_ignored_root_without_source_scope_retains_prior_behavior(self):
+        (self.root / ".gitignore").write_text("*.inc\n")
+        self.git("add", ".gitignore")
+        self.git("commit", "-qm", "fixture ignore policy")
+        sha = self.git("rev-parse", "HEAD").stdout.strip()
+        unrelated = self.root / "build"
+        unrelated.mkdir()
+        (unrelated / "cache.inc").write_text("test-only ignored cache\n")
+        run, output = self.run_gate(sha)
+        self.assertEqual(run.returncode, 0, (run.stdout, run.stderr))
+        self.assertIn("source-sha=" + sha, output)
+
+    def test_ignored_governance_manifest_is_rejected(self):
+        (self.root / ".gitignore").write_text("*.json\n")
+        self.git("add", ".gitignore")
+        self.git("commit", "-qm", "fixture ignore policy")
+        sha = self.git("rev-parse", "HEAD").stdout.strip()
+        target = self.root / "governance"
+        target.mkdir()
+        (target / "policy.json").write_text('{"claim_allowed":true}\n')
+        self.reject(sha, "ignored_critical_input")
+
+    def test_ignored_workflow_is_rejected(self):
+        (self.root / ".gitignore").write_text("*.yml\n")
+        self.git("add", ".gitignore")
+        self.git("commit", "-qm", "fixture ignore policy")
+        sha = self.git("rev-parse", "HEAD").stdout.strip()
+        target = self.root / ".github" / "workflows"
+        target.mkdir(parents=True)
+        (target / "rogue.yml").write_text("on: push\n")
+        self.reject(sha, "ignored_critical_input")
+
 
 
 if __name__ == "__main__":
