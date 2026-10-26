@@ -80,7 +80,7 @@ class GateTests(unittest.TestCase):
     def test_blank_provenance_rejected(self):
         for key in ("observed_date", "origin", "note"):
             with self.subTest(key=key):
-                self.assertTrue(validate_manifest(dict(self.base, **{key: " "}))
+                self.assertTrue(validate_manifest(dict(self.base, **{key: " "})))
 
 
 if __name__ == "__main__":
