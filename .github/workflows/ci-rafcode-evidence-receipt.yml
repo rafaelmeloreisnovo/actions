@@ -1,0 +1,40 @@
+name: RAFCODE hosted evidence receipt gate
+on:
+  pull_request:
+    paths:
+      - "rafcode/evidence-receipt/**"
+      - ".github/workflows/ci-rafcode-evidence-receipt.yml"
+  push:
+    branches: [main]
+    paths:
+      - "rafcode/evidence-receipt/**"
+      - ".github/workflows/ci-rafcode-evidence-receipt.yml"
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  evidence-receipt-tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+      - uses: ./rafcode/verify-source
+        with:
+          expected-sha: ${{ github.event.pull_request.head.sha || github.sha }}
+      - name: Unit negative fixtures and syntax
+        run: |
+          set -euo pipefail
+          python3 -m unittest discover -s rafcode/evidence-receipt -p "test_receipt.py" -v
+          python3 -m py_compile rafcode/evidence-receipt/issue_receipt.py
+          python3 -m unittest discover -s rafcode/evidence-receipt -p "test_provider_verify.py" -v
+          python3 -m py_compile rafcode/evidence-receipt/provider_verify.py
+      - name: Self-receipt on owned source
+        uses: ./rafcode/evidence-receipt
+        with:
+          expected-source-sha: ${{ github.event.pull_request.head.sha || github.sha }}
+          artifact-path: rafcode/evidence-receipt/issue_receipt.py
+          falsifier-script: rafcode/evidence-receipt/host_falsifier.sh
+          falsifier-id: RECEIPT_NEGATIVE_TESTS

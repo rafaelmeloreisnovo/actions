@@ -1,0 +1,37 @@
+name: RAFCODE bounded execution receipt
+description: Run one pinned source falsifier, bind host run ID, HEAD SHA and artifact SHA-256 (provisional HOLD).
+inputs:
+  expected-source-sha:
+    description: Full 40-char commit SHA of the checked-out producer source.
+    required: true
+  artifact-path:
+    description: Repository-relative existing regular file to hash (max 128MiB).
+    required: true
+  falsifier-script:
+    description: Reviewed repository-relative shell script executed without credentials.
+    required: true
+  falsifier-id:
+    description: Stable uppercase test identifier.
+    required: true
+outputs:
+  receipt-sha256:
+    description: Canonical JSON receipt digest; not a signature or independent review.
+    value: ${{ steps.issue.outputs.receipt-sha256 }}
+  artifact-sha256:
+    description: SHA-256 of the actual producer file.
+    value: ${{ steps.issue.outputs.artifact-sha256 }}
+  source-sha:
+    description: Verified exact checkout SHA.
+    value: ${{ steps.issue.outputs.source-sha }}
+runs:
+  using: composite
+  steps:
+    - id: issue
+      shell: bash
+      env:
+        RAF_EXPECTED_SHA: ${{ inputs.expected-source-sha }}
+        RAF_ARTIFACT_PATH: ${{ inputs.artifact-path }}
+        RAF_FALSIFIER_SCRIPT: ${{ inputs.falsifier-script }}
+        RAF_FALSIFIER_ID: ${{ inputs.falsifier-id }}
+        RAF_RECEIPT_ACTION: ${{ github.action_path }}
+      run: python3 "$RAF_RECEIPT_ACTION/issue_receipt.py"
