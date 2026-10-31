@@ -4,7 +4,9 @@ typedef signed int jint;
 __attribute__((visibility("default")))
 jint Java_org_rafaelia_atlas_AtlasWizard_nativePlan(void *env, void *object,
     jint key, jint revision, jint scope, jint gap, jint attestation){
- ra_atlas_request q={0};ra_atlas_receipt r;
+ ra_atlas_request q;ra_atlas_receipt r;
+ volatile ra_u32 *words=(volatile ra_u32 *)&q;ra_u32 i;
+ for(i=0u;i<(ra_u32)(sizeof(q)/sizeof(ra_u32));i++)words[i]=0u;
  (void)env;(void)object;
  q.magic=RA_MAGIC;q.version=RA_VERSION;q.sequence=2u;q.previous_sequence=1u;
  q.present=RA_PRESENT_ALL;q.scope=(ra_u32)scope;
