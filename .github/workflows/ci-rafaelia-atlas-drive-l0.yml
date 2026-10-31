@@ -1,0 +1,57 @@
+name: RAFAELIA Atlas Drive L0 synthetic gate
+
+on:
+  pull_request:
+    paths:
+      - 'freestanding/atlas_drive_l0/**'
+      - '.github/workflows/ci-rafaelia-atlas-drive-l0.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: atlas-l0-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bounded-freestanding:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Checkout exact candidate SHA without credentials
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+      - name: Ensure exact source, compile three objects, and run synthetic falsifiers
+        env:
+          SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$SOURCE_SHA"
+          sh freestanding/atlas_drive_l0/tests/verify.sh | tee atlas-l0-test-receipt.txt
+          sh freestanding/atlas_drive_l0/tests/mutate.sh | tee -a atlas-l0-test-receipt.txt
+          grep -q 'ATLAS_L0_HOST_SCOPE_PASS' atlas-l0-test-receipt.txt
+          {
+            printf 'ATLAS_DRIVE_L0_SYNTHETIC_RECEIPT_V1\n'
+            printf 'source_sha=%s\n' "$SOURCE_SHA"
+            printf 'scope=SYNTHETIC_HOST_AND_CROSS_OBJECT_ONLY\n'
+            printf 'claim_allowed=false\n'
+            printf 'provider_drive_execution=NOT_RUN\n'
+            printf 'android_apk=NOT_BUILT\n'
+            sha256sum freestanding/atlas_drive_l0/atlas.c \
+              freestanding/atlas_drive_l0/atlas.h \
+              freestanding/atlas_drive_l0/tests/test_atlas.c
+          } >> atlas-l0-test-receipt.txt
+          cat atlas-l0-test-receipt.txt >> "$GITHUB_STEP_SUMMARY"
+      - name: Publish synthetic-only evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: atlas-l0-synthetic-${{ github.run_id }}
+          path: atlas-l0-test-receipt.txt
+          if-no-files-found: warn
+          retention-days: 7
