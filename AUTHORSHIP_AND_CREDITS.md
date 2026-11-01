@@ -33,3 +33,7 @@ Protected `main` state is not inferred from workflow YAML. No inherited runtime 
 See `provenance/lineage.v1.json` for the concise machine-readable map and `freestanding/provenance_core/README.md` for the pure source contract.
 
 R3 = <F_ok: boundaries and credits routed, F_gap: versioned upstream provenance, human rights attestation and CI, F_next: lineaged file census before any product replacement>.
+
+## 2026-10-31 — provider × upstream × local delta (scoped snapshot V2)
+
+**GitHub Actions is the external CI service, not an independently authored module in this fork.** `gradle/actions` is upstream implementation; RAFAELIA paths are candidate local deltas with per-file evidence and unresolved rights. See [the explicit three-authority boundary](provenance/BOUNDARY_GITHUB_GRADLE_RAFAELIA_V2.md) and [immutable observed-blob census](provenance/attribution_snapshot.v2.json). The [stdlib-only verifier](provenance/verify_attribution.py) is a *byte-identity and consistency gate*, not a legal author certificate or a claim of remote CI PASS. On 2026-10-31 the merged Atlas APK source is present but an exact-head run receipt was not returned by the scoped query. `claim_allowed=false` for release/whole-fork attribution. Reuse of the same `atlas.c` blob in L0 and Android is recorded as source reuse, not a second original creation.

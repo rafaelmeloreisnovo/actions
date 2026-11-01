@@ -8,6 +8,13 @@ on:
       - 'freestanding/provenance_core/**'
       - 'provenance/**'
       - 'AUTHORSHIP_AND_CREDITS.md'
+      - 'android/atlas_wizard/**'
+      - 'freestanding/atlas_drive_l0/**'
+      - '.github/workflows/ci-atlas-android-apk.yml'
+      - '.github/workflows/evidence-registry.yml'
+      - 'setup-gradle/action.yml'
+      - 'dist/**'
+      - 'LICENSE'
       - '.github/workflows/ci-rafaelia-rights.yml'
   push:
     branches: [main]
@@ -15,6 +22,13 @@ on:
       - 'freestanding/provenance_core/**'
       - 'provenance/**'
       - 'AUTHORSHIP_AND_CREDITS.md'
+      - 'android/atlas_wizard/**'
+      - 'freestanding/atlas_drive_l0/**'
+      - '.github/workflows/ci-atlas-android-apk.yml'
+      - '.github/workflows/evidence-registry.yml'
+      - 'setup-gradle/action.yml'
+      - 'dist/**'
+      - 'LICENSE'
       - '.github/workflows/ci-rafaelia-rights.yml'
   workflow_dispatch:
 
@@ -43,6 +57,8 @@ jobs:
         run: |
           set -euo pipefail
           test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+          python3 provenance/verify_attribution.py
+          python3 -m unittest discover -s provenance/tests -p 'test_*.py' -v
           python3 -m json.tool provenance/lineage.v1.json >/dev/null
           python3 -m unittest discover -s freestanding/provenance_core/tests -p 'test_*.py' -v
           clang -std=c11 -O1 -g -Wall -Wextra -Werror \
