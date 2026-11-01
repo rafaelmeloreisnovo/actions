@@ -1,0 +1,50 @@
+# New fork-local orchestration only; uses GitHub-hosted CI, no Gradle code or user-authored Java.
+name: RAFAELIA entry L0 - scoped freestanding gate
+on:
+  pull_request:
+    paths:
+      - 'freestanding/entry_l0/**'
+      - '.github/workflows/ci-rafaelia-entry-l0.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: entry-l0-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  source-only:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - name: Fetch exact candidate head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Run bounded source-host falsifiers
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+          sh freestanding/entry_l0/tests/verify.sh | tee entry-l0-receipt.txt
+          grep -Fxq ENTRY_L0_HOST_SCOPE_PASS entry-l0-receipt.txt
+          {
+            printf 'SOURCE_SHA=%s\n' "$EXPECTED_SOURCE_SHA"
+            printf 'SCOPE=HOST_ASAN_UBSAN_AND_ARM_CROSS_OBJECTS_ONLY\n'
+            printf 'RIGHTS=TOKEN_VAZIO_HOLDER_AND_LICENSE\n'
+            printf 'DEVICE=NOT_RUN\nGPU_NUMA_ART_DEX=NOT_IMPLEMENTED\n'
+            printf 'CLAIM_ALLOWED=false\nRELEASE_ALLOWED=false\n'
+            sha256sum freestanding/entry_l0/entry.c freestanding/entry_l0/entry.h
+          } >> entry-l0-receipt.txt
+          cat entry-l0-receipt.txt >> "$GITHUB_STEP_SUMMARY"
+      - name: Save scoped source-only receipt
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a
+        with:
+          name: entry-l0-${{ github.run_id }}
+          path: entry-l0-receipt.txt
+          if-no-files-found: warn
+          retention-days: 7
