@@ -1,0 +1,63 @@
+{
+  "schema": "RAFAELIA_OMEGA_COMPARISON_RECEIPT_V1",
+  "kind": "APPEND_ONLY_LOCAL_COMPARISON",
+  "observed_at_utc": "2026-11-01T02:35:00Z",
+  "repo": "rafaelmeloreisnovo/actions",
+  "base_main_sha": "e536d230cd34b66fafffa073d26b39b2989e6da9",
+  "proposal_parent_sha": "c2e1e5464cbbf7570591392a02b03c103050fba7",
+  "baseline": "SOURCE_READ_ONLY",
+  "comparison": {
+    "new_files_initial": 7,
+    "modified_inherited_files": 0,
+    "deleted_files": 0,
+    "history_overwrite": false,
+    "baseline_parent_preserved": true
+  },
+  "input": {
+    "label": "user-provided RAFAELIA_OMEGA_freestanding_lab.zip",
+    "sha256": "8b2dc23547c21db12bdc020f5545d6b52f10d158fa767f25df4d1ecca7000b47"
+  },
+  "local_host": {
+    "scope": "HOST_ONLY",
+    "gate": "bash freestanding/omega_bridge/ci_gate.sh",
+    "result": "PASS",
+    "test_programs": [
+      "test_core",
+      "test_contract"
+    ],
+    "sanitizers": [
+      "ASAN",
+      "UBSAN"
+    ],
+    "object_cross_compilation": [
+      "x86_64",
+      "armv7",
+      "aarch64"
+    ],
+    "undefined_symbols": "NONE",
+    "log_sha256": "4e9041d366c29b0ecfc6d0164a29f26c11dc5dc936f6a85a0e88d4f393bfa6db"
+  },
+  "hosted_ci": {
+    "status": "TOKEN_VAZIO_NOT_OBSERVED",
+    "run_id": null,
+    "head_sha": null
+  },
+  "scientific": {
+    "rll_covariance": "TOKEN_VAZIO",
+    "sensor_calibration": "TOKEN_VAZIO",
+    "theorem_matrix_complete": false,
+    "claim_allowed": false
+  },
+  "physical": {
+    "arm32": "NOT_RUN",
+    "arm64": "NOT_RUN"
+  },
+  "ownership": {
+    "inherited": "gradle/actions -- unaffected",
+    "new": "RAFAELIA local proposed contribution",
+    "rights_release": "TOKEN_VAZIO"
+  },
+  "gate": "DRAFT_HOLD",
+  "next": "verify exact-head Actions logs; hold promotion",
+  "rollback": "close PR without merge; preserve history"
+}
