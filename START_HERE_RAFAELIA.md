@@ -91,3 +91,7 @@ Para pessoas e agentes de software: [INSECTION / índice Dispatch L0](freestandi
 ## 2026-10-24 — CI source identity adapter
 
 [Exact source gate](rafcode/verify-source/README.md) binds Termux consumer tests to a full commit SHA and clean tracked checkout. Hosted Bash/Git boundary; no Node, runtime or promotion claim.
+
+## 2026-10-31 — provenance snapshot V2 (scoped, append-only)
+
+Start with [the three-authority boundary](provenance/BOUNDARY_GITHUB_GRADLE_RAFAELIA_V2.md) → [file/blob census](provenance/attribution_snapshot.v2.json) → [validator](provenance/verify_attribution.py). This newer observation does not overwrite historical PR #3 or grant rights, and does not infer GitHub Actions CI PASS from merged commits. See `AUTHORSHIP_AND_CREDITS.md` for attribution and outstanding legal gates.
