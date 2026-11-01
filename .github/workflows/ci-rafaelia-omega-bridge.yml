@@ -1,0 +1,45 @@
+name: RAFAELIA authorial Omega bridge / isolated exact HEAD
+on:
+  pull_request:
+    paths:
+      - 'freestanding/omega_bridge/**'
+      - '.github/workflows/ci-rafaelia-omega-bridge.yml'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: omega-bridge-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+jobs:
+  authorial-host-and-cross-objects:
+    name: Omega / exact HEAD, host ASAN UBSAN, x86 ARM32 ARM64 objects
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # pinned upstream tool, not RAFAELIA authorship
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          persist-credentials: false
+          fetch-depth: 1
+      - name: Exact HEAD and independent freestanding gate
+        shell: bash
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: bash freestanding/omega_bridge/ci_gate.sh
+      - name: Receipt summary
+        if: always()
+        shell: bash
+        run: |
+          if test -f "${RUNNER_TEMP}/rafaelia_omega_bridge_gate/receipt.txt"; then
+            cat "${RUNNER_TEMP}/rafaelia_omega_bridge_gate/receipt.txt" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'NO_GATE_RECEIPT' >> "$GITHUB_STEP_SUMMARY"
+          fi
+      - name: Upload scoped receipts
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # pinned upstream tool, not RAFAELIA authorship
+        with:
+          name: omega-bridge-authorial-host-and-objects
+          path: ${{ runner.temp }}/rafaelia_omega_bridge_gate/receipt.txt
+          retention-days: 30
+          if-no-files-found: warn
