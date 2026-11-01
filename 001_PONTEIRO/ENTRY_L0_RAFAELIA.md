@@ -1,0 +1,11 @@
+# 001_PONTEIRO — RAFAELIA ENTRY L0 (2026-10-31)
+- **Intent:** own freestanding C entry; no copied Gradle routines, source or control flow
+- **Runtime authority:** freestanding/entry_l0/entry.h + entry.c; producer is fork-local candidate awaiting extraction to independent producer repo
+- **History:** main@e536d230cd34b66fafffa073d26b39b2989e6da9 + draft branch feat/rafaelia-entry-l0-no-gradle-source-20261031-hold
+- **Tests:** freestanding/entry_l0/tests/verify.sh and focused new workflow .github/workflows/ci-rafaelia-entry-l0.yml
+- **Rights:** freestanding/entry_l0/LICENSES/README.md; inherited upstream fork remains unaffected; no new license grant
+- **Dependency boundary:** GitHub-hosted Actions is an external execution service; optional Gradle is caller-side, NOT imported; Android NativeActivity adapter not implemented here
+- **Risk:** hosted CI != physical ARM/Android, LLVM object != ELF runtime, NEON compile != device execution
+- **Review gate:** source SHA + CI run ID/log/artifact + separate holder attestation + device receipt + reviewer
+- **Rollback:** close draft PR or revert its exact commits, preserve historical upstream blobs
+- **claim_allowed:** false; **release_allowed:** false
