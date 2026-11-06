@@ -1,0 +1,406 @@
+{
+  "schema": "rafaelia.upstream-contribution-roadmap/v1",
+  "observed_at": "2026-11-06",
+  "fork": "rafaelmeloreisnovo/actions",
+  "fork_main_sha": "2138f9c78df588a577e560c7ae3dfdb89c5a1be9",
+  "upstream": "gradle/actions",
+  "upstream_main_sha": "c8a326d85724fce2ae59a38810306f4a058f26a4",
+  "upstream_v6_vendor_policy": "Do not edit sources/vendor/gradle-actions-caching or dist directly; actions-caching is separate producer",
+  "sources": [
+    "https://github.com/gradle/actions/blob/c8a326d85724fce2ae59a38810306f4a058f26a4/CONTRIBUTING.md",
+    "https://github.com/gradle/actions/blob/c8a326d85724fce2ae59a38810306f4a058f26a4/CLAUDE.md",
+    "https://github.com/gradle/actions/blob/c8a326d85724fce2ae59a38810306f4a058f26a4/DISTRIBUTION.md",
+    "https://www.alphaxiv.org/abs/2604.27148",
+    "https://github.com/gradle/actions/blob/c8a326d85724fce2ae59a38810306f4a058f26a4/.github/dco.yml"
+  ],
+  "pipeline": [
+    "INTAKE",
+    "SOURCE_AUTHORITY",
+    "ISSUE_REPRO",
+    "SCOPED_PATCH",
+    "NEGATIVE_TESTS",
+    "SOURCE_DIFF",
+    "CI_FULL_REEXECUTION",
+    "MAINTAINER_REVIEW",
+    "MERGE_BY_UPSTREAM_ONLY",
+    "RECEIPT"
+  ],
+  "gate_policy": {
+    "value": "SOURCE!=ARTIFACT!=EXECUTION!=EVIDENCE!=CLAIM",
+    "status": "IMPLEMENTED_UNTESTED_NOT_MERGED",
+    "provider_check_state": "NONE_RETURNED_AS_OF_OBSERVATION",
+    "verified_code_paths_for_patches": 5,
+    "upstream_submission_state": "NOT_SUBMITTED",
+    "claim_allowed": false,
+    "release_allowed": false,
+    "allowed_merge_without_provider_pass": false,
+    "proposed_checkpoint_dates_are_commitments": false,
+    "hard_deadline": null,
+    "confidentiality": "No secrets/PATs, device logs, personal files or proprietary code in public forks.",
+    "external_dco_attestation": "TOKEN_VAZIO_NOT_ATTESTED"
+  },
+  "issues": [
+    {
+      "issue_id": "gradle/actions#549",
+      "url": "https://github.com/gradle/actions/issues/549",
+      "upstream_observed_state": "open",
+      "title": "Persistent debug gradle.properties after setup-gradle",
+      "priority": "P0",
+      "producer_authority": "gradle/actions",
+      "area": "setup-gradle/gradle-user-home",
+      "stage": "PATCH_DRAFT_UNTESTED",
+      "relation_types": [
+        "reported_by",
+        "governed_by",
+        "tested_by",
+        "blocks"
+      ],
+      "rationale": "Persistent self-hosted runner may retain debug logging options and alter following jobs.",
+      "risk": "unexpected log verbosity + shared-runner contamination",
+      "patch_pr": "https://github.com/rafaelmeloreisnovo/actions/pull/27",
+      "patch_head": "c9ed8091b19f14e796bfad23bfb103d51f4a32bc",
+      "patch_base": "c8a326d85724fce2ae59a38810306f4a058f26a4",
+      "blocked_by": [],
+      "needed_evidence": [
+        "UPSTREAM_CHECK_AND_UNIT",
+        "TARGETED_REGRESSION",
+        "UPSTREAM_INTEGRATION",
+        "DIFF_SCOPE_REVIEW",
+        "MAINTAINER_REVIEW",
+        "NO_UNAUTHORIZED_LICENSE_CLAIM"
+      ],
+      "checkpoint": {
+        "proposed_date": "2026-11-09",
+        "status": "NOT_RUN",
+        "binding": false
+      },
+      "hard_deadline": null,
+      "deadline_reason": "TOKEN_VAZIO: no upstream maintainer deadline or SLA observed",
+      "acceptance": "Exact issue-specific falsifier + untouched unrelated behavior + full upstream CI receipts + maintainer acceptance.",
+      "rollback": "Close draft PR or revert candidate commit; do not modify upstream main or erase history.",
+      "release_allowed": false,
+      "claim_allowed": false,
+      "confidence_scope": "Observed issue status and candidate code where linked; this registry is not a CI or legal PASS."
+    },
+    {
+      "issue_id": "gradle/actions#656",
+      "url": "https://github.com/gradle/actions/issues/656",
+      "upstream_observed_state": "open",
+      "title": "Dependency graph HTTP 503 not retried",
+      "priority": "P1",
+      "producer_authority": "gradle/actions",
+      "area": "dependency-graph/snapshot submission",
+      "stage": "PATCH_DRAFT_UNTESTED",
+      "relation_types": [
+        "reported_by",
+        "governed_by",
+        "tested_by",
+        "blocks"
+      ],
+      "rationale": "Transient GitHub API response can prevent dependency graph submission; preserve existing continue-on-failure semantics.",
+      "risk": "missing vulnerability snapshot + duplicate request ambiguity",
+      "patch_pr": "https://github.com/rafaelmeloreisnovo/actions/pull/28",
+      "patch_head": "4bb062b415c6217013e75f82d5a4067816265ddf",
+      "patch_base": "c8a326d85724fce2ae59a38810306f4a058f26a4",
+      "blocked_by": [],
+      "needed_evidence": [
+        "UPSTREAM_CHECK_AND_UNIT",
+        "TARGETED_REGRESSION",
+        "UPSTREAM_INTEGRATION",
+        "DIFF_SCOPE_REVIEW",
+        "MAINTAINER_REVIEW",
+        "NO_UNAUTHORIZED_LICENSE_CLAIM"
+      ],
+      "checkpoint": {
+        "proposed_date": "2026-11-09",
+        "status": "NOT_RUN",
+        "binding": false
+      },
+      "hard_deadline": null,
+      "deadline_reason": "TOKEN_VAZIO: no upstream maintainer deadline or SLA observed",
+      "acceptance": "Exact issue-specific falsifier + untouched unrelated behavior + full upstream CI receipts + maintainer acceptance.",
+      "rollback": "Close draft PR or revert candidate commit; do not modify upstream main or erase history.",
+      "release_allowed": false,
+      "claim_allowed": false,
+      "confidence_scope": "Observed issue status and candidate code where linked; this registry is not a CI or legal PASS."
+    },
+    {
+      "issue_id": "gradle/actions#316",
+      "url": "https://github.com/gradle/actions/issues/316",
+      "upstream_observed_state": "open",
+      "title": "Reusable workflow GUH cache key collision",
+      "priority": "P1",
+      "producer_authority": "gradle/actions-caching",
+      "area": "enhanced-cache/key identity",
+      "stage": "BLOCKED_PRODUCER",
+      "relation_types": [
+        "reported_by",
+        "governed_by",
+        "tested_by",
+        "blocks"
+      ],
+      "rationale": "Upstream v6 moved enhanced caching to proprietary producer; source authority must be resolved before a code patch.",
+      "risk": "cache contamination and immutability",
+      "patch_pr": "",
+      "patch_head": null,
+      "patch_base": null,
+      "blocked_by": [
+        "SOURCE_AUTHORITY_RECHECK",
+        "REPRO_ON_V6_ENHANCED_AND_BASIC"
+      ],
+      "needed_evidence": [
+        "UPSTREAM_CHECK_AND_UNIT",
+        "TARGETED_REGRESSION",
+        "UPSTREAM_INTEGRATION",
+        "DIFF_SCOPE_REVIEW",
+        "MAINTAINER_REVIEW",
+        "NO_UNAUTHORIZED_LICENSE_CLAIM"
+      ],
+      "checkpoint": {
+        "proposed_date": "2026-11-13",
+        "status": "NOT_STARTED",
+        "binding": false
+      },
+      "hard_deadline": null,
+      "deadline_reason": "TOKEN_VAZIO: no upstream maintainer deadline or SLA observed",
+      "acceptance": "Exact issue-specific falsifier + untouched unrelated behavior + full upstream CI receipts + maintainer acceptance.",
+      "rollback": "Close draft PR or revert candidate commit; do not modify upstream main or erase history.",
+      "release_allowed": false,
+      "claim_allowed": false,
+      "confidence_scope": "Observed issue status and candidate code where linked; this registry is not a CI or legal PASS."
+    },
+    {
+      "issue_id": "gradle/actions#722",
+      "url": "https://github.com/gradle/actions/issues/722",
+      "upstream_observed_state": "open",
+      "title": "ReserveCacheError from matrix reusable workflow",
+      "priority": "P1",
+      "producer_authority": "gradle/actions-caching",
+      "area": "enhanced-cache/cache key concurrency",
+      "stage": "BLOCKED_PRODUCER",
+      "relation_types": [
+        "reported_by",
+        "governed_by",
+        "tested_by",
+        "blocks"
+      ],
+      "rationale": "May overlap #316's identity mechanism, but symptom/trigger and provider differ; do not deduplicate as identical defects.",
+      "risk": "cache write failure and correlation ambiguity",
+      "patch_pr": null,
+      "patch_head": null,
+      "patch_base": null,
+      "blocked_by": [
+        "CROSS_REFERENCE_316",
+        "REPRO_ON_V6"
+      ],
+      "needed_evidence": [
+        "UPSTREAM_CHECK_AND_UNIT",
+        "TARGETED_REGRESSION",
+        "UPSTREAM_INTEGRATION",
+        "DIFF_SCOPE_REVIEW",
+        "MAINTAINER_REVIEW",
+        "NO_UNAUTHORIZED_LICENSE_CLAIM"
+      ],
+      "checkpoint": {
+        "proposed_date": "2026-11-13",
+        "status": "NOT_STARTED",
+        "binding": false
+      },
+      "hard_deadline": null,
+      "deadline_reason": "TOKEN_VAZIO: no upstream maintainer deadline or SLA observed",
+      "acceptance": "Exact issue-specific falsifier + untouched unrelated behavior + full upstream CI receipts + maintainer acceptance.",
+      "rollback": "Close draft PR or revert candidate commit; do not modify upstream main or erase history.",
+      "release_allowed": false,
+      "claim_allowed": false,
+      "confidence_scope": "Observed issue status and candidate code where linked; this registry is not a CI or legal PASS."
+    },
+    {
+      "issue_id": "gradle/actions#813",
+      "url": "https://github.com/gradle/actions/issues/813",
+      "upstream_observed_state": "open",
+      "title": "Validate Gradle wrapper JAR with PGP",
+      "priority": "P1",
+      "producer_authority": "gradle/actions",
+      "area": "wrapper-validation/trust chain",
+      "stage": "DESIGN_PENDING",
+      "relation_types": [
+        "reported_by",
+        "governed_by",
+        "tested_by",
+        "blocks"
+      ],
+      "rationale": "Maintainer issue proposes signatures replacing/augmenting hardcoded checksums; trust anchors and offline rules require specification.",
+      "risk": "security boundary and key rotation",
+      "patch_pr": null,
+      "patch_head": null,
+      "patch_base": null,
+      "blocked_by": [
+        "TRUST_ANCHORS",
+        "OFFLINE_COMPATIBILITY",
+        "SIGNATURE_POLICY"
+      ],
+      "needed_evidence": [
+        "UPSTREAM_CHECK_AND_UNIT",
+        "TARGETED_REGRESSION",
+        "UPSTREAM_INTEGRATION",
+        "DIFF_SCOPE_REVIEW",
+        "MAINTAINER_REVIEW",
+        "NO_UNAUTHORIZED_LICENSE_CLAIM"
+      ],
+      "checkpoint": {
+        "proposed_date": "2026-11-16",
+        "status": "NOT_STARTED",
+        "binding": false
+      },
+      "hard_deadline": null,
+      "deadline_reason": "TOKEN_VAZIO: no upstream maintainer deadline or SLA observed",
+      "acceptance": "Exact issue-specific falsifier + untouched unrelated behavior + full upstream CI receipts + maintainer acceptance.",
+      "rollback": "Close draft PR or revert candidate commit; do not modify upstream main or erase history.",
+      "release_allowed": false,
+      "claim_allowed": false,
+      "confidence_scope": "Observed issue status and candidate code where linked; this registry is not a CI or legal PASS."
+    },
+    {
+      "issue_id": "gradle/actions#286",
+      "url": "https://github.com/gradle/actions/issues/286",
+      "upstream_observed_state": "open",
+      "title": "Validate distribution URL and SHA256 from wrapper properties",
+      "priority": "P1",
+      "producer_authority": "gradle/actions",
+      "area": "wrapper-validation/properties",
+      "stage": "DESIGN_PENDING",
+      "relation_types": [
+        "reported_by",
+        "governed_by",
+        "tested_by",
+        "blocks"
+      ],
+      "rationale": "Needs canonical distribution binding without breaking sanctioned custom mirrors or offline workflows.",
+      "risk": "compatibility and false rejection",
+      "patch_pr": null,
+      "patch_head": null,
+      "patch_base": null,
+      "blocked_by": [
+        "CUSTOM_DISTRIBUTION_POLICY",
+        "OFFLINE_VALIDATION",
+        "RELATED_813"
+      ],
+      "needed_evidence": [
+        "UPSTREAM_CHECK_AND_UNIT",
+        "TARGETED_REGRESSION",
+        "UPSTREAM_INTEGRATION",
+        "DIFF_SCOPE_REVIEW",
+        "MAINTAINER_REVIEW",
+        "NO_UNAUTHORIZED_LICENSE_CLAIM"
+      ],
+      "checkpoint": {
+        "proposed_date": "2026-11-16",
+        "status": "NOT_STARTED",
+        "binding": false
+      },
+      "hard_deadline": null,
+      "deadline_reason": "TOKEN_VAZIO: no upstream maintainer deadline or SLA observed",
+      "acceptance": "Exact issue-specific falsifier + untouched unrelated behavior + full upstream CI receipts + maintainer acceptance.",
+      "rollback": "Close draft PR or revert candidate commit; do not modify upstream main or erase history.",
+      "release_allowed": false,
+      "claim_allowed": false,
+      "confidence_scope": "Observed issue status and candidate code where linked; this registry is not a CI or legal PASS."
+    },
+    {
+      "issue_id": "gradle/actions#1088",
+      "url": "https://github.com/gradle/actions/issues/1088",
+      "upstream_observed_state": "open",
+      "title": "Gradle 9.8.0 dependency submission failure",
+      "priority": "P1",
+      "producer_authority": "TOKEN_VAZIO_PRODUCER_UNVERIFIED",
+      "area": "gradle-plugin/dependency extraction",
+      "stage": "NEEDS_REPRO",
+      "relation_types": [
+        "reported_by",
+        "governed_by",
+        "tested_by",
+        "blocks"
+      ],
+      "rationale": "Gradle graph ordering exception may originate in Gradle or dependency graph plugin; assigning source by exception text would be fiction.",
+      "risk": "Gradle 9.8 compatibility and graph loss",
+      "patch_pr": null,
+      "patch_head": null,
+      "patch_base": null,
+      "blocked_by": [
+        "MINIMAL_REPRO",
+        "PRODUCER_AUTHORITY",
+        "EXACT_VERSION_MATRIX"
+      ],
+      "needed_evidence": [
+        "UPSTREAM_CHECK_AND_UNIT",
+        "TARGETED_REGRESSION",
+        "UPSTREAM_INTEGRATION",
+        "DIFF_SCOPE_REVIEW",
+        "MAINTAINER_REVIEW",
+        "NO_UNAUTHORIZED_LICENSE_CLAIM"
+      ],
+      "checkpoint": {
+        "proposed_date": "2026-11-13",
+        "status": "NOT_STARTED",
+        "binding": false
+      },
+      "hard_deadline": null,
+      "deadline_reason": "TOKEN_VAZIO: no upstream maintainer deadline or SLA observed",
+      "acceptance": "Exact issue-specific falsifier + untouched unrelated behavior + full upstream CI receipts + maintainer acceptance.",
+      "rollback": "Close draft PR or revert candidate commit; do not modify upstream main or erase history.",
+      "release_allowed": false,
+      "claim_allowed": false,
+      "confidence_scope": "Observed issue status and candidate code where linked; this registry is not a CI or legal PASS."
+    }
+  ],
+  "typed_edges": [
+    {
+      "from": "gradle/actions#549",
+      "type": "candidate_patch",
+      "to": "rafaelmeloreisnovo/actions#27"
+    },
+    {
+      "from": "gradle/actions#656",
+      "type": "candidate_patch",
+      "to": "rafaelmeloreisnovo/actions#28"
+    },
+    {
+      "from": "gradle/actions#316",
+      "type": "governed_by",
+      "to": "gradle/actions-caching"
+    },
+    {
+      "from": "gradle/actions#722",
+      "type": "related_to_not_equivalent",
+      "to": "gradle/actions#316"
+    },
+    {
+      "from": "gradle/actions#813",
+      "type": "shares_validation_boundary",
+      "to": "gradle/actions#286"
+    },
+    {
+      "from": "gradle/actions#1088",
+      "type": "producer_unknown",
+      "to": "TOKEN_VAZIO"
+    },
+    {
+      "from": "rafaelmeloreisnovo/actions#26",
+      "type": "separate_rights_overlay",
+      "to": "rafaelmeloreisnovo/actions"
+    }
+  ],
+  "control": {
+    "canonical_pointer": "001_PONTEIRO/UPSTREAM_CONTRIBUTION_ROUTER_V1.md",
+    "exact_head_ci_workflows": [
+      "ci-check-and-unit-test.yml",
+      "ci-check-no-dist-update.yml"
+    ],
+    "existing_registry_test_workflow": ".github/workflows/ci-rafaelia-rights.yml",
+    "selected_base_branch": "contrib/gradle-upstream-base-20261106",
+    "no_new_parallel_scheduler": true,
+    "rollback": "Close draft PRs #27/#28/#29; upstream Gradle main unchanged.",
+    "readback_expected": "Compare patch heads to c8a326d85724fce2ae59a38810306f4a058f26a4 and attest file changes before claim promotion",
+    "next": "Provider CI exact-head + inspect and satisfy upstream DCO through authorized contributor + maintainer review; no invented signoff"
+  }
+}
