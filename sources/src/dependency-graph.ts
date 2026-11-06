@@ -219,10 +219,41 @@ async function submitDependencyGraphFile(jsonFile: string): Promise<void> {
     const jsonContent = fs.readFileSync(jsonFile, 'utf8')
 
     const snapshot = toSnapshotRequest(JSON.parse(jsonContent), github.context.repo.owner, github.context.repo.repo)
-    const response = await octokit.request('POST /repos/{owner}/{repo}/dependency-graph/snapshots', snapshot)
+    const response = await retryTransientSubmission(() =>
+        octokit.request('POST /repos/{owner}/{repo}/dependency-graph/snapshots', snapshot)
+    )
 
     const relativeJsonFile = getRelativePathFromWorkspace(jsonFile)
     core.notice(`Submitted ${relativeJsonFile}: ${response.data.message}`)
+}
+
+/**
+ * Retry only transient upstream HTTP gateway/service failures during snapshot submission.
+ * Keep existing dependency-graph-continue-on-failure behavior: terminal errors still throw.
+ * The request body is identical across attempts; do not retry permissions, validation or other 4xx errors.
+ */
+export async function retryTransientSubmission<T>(
+    request: () => Promise<T>,
+    sleep: (milliseconds: number) => Promise<void> = milliseconds =>
+        new Promise<void>(resolve => setTimeout(resolve, milliseconds))
+): Promise<T> {
+    const maxRetries = 2
+    for (let attempt = 0; ; attempt++) {
+        try {
+            return await request()
+        } catch (error) {
+            const status =
+                error !== null && typeof error === 'object' && 'status' in error ? error.status : undefined
+            if (typeof status !== 'number' || ![502, 503, 504].includes(status) || attempt >= maxRetries) {
+                throw error
+            }
+            const delayMs = 1000 * 2 ** attempt
+            core.warning(
+                `Dependency graph API returned HTTP ${status}; retrying submission (${attempt + 1}/${maxRetries}).`
+            )
+            await sleep(delayMs)
+        }
+    }
 }
 
 // Only the snapshot fields are copied into the request: the file may come from an untrusted artifact,

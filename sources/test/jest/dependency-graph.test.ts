@@ -1,7 +1,7 @@
 import {describe, expect, it} from '@jest/globals'
 
 import {DependencyGraphConfig} from "../../src/configuration" 
-import {toSnapshotRequest} from "../../src/dependency-graph"
+import {toSnapshotRequest, retryTransientSubmission} from "../../src/dependency-graph"
 
 describe('dependency-graph', () => {
     describe('constructs job correlator', () => {
@@ -43,5 +43,83 @@ describe('dependency-graph', () => {
             const request = toSnapshotRequest({version: 0, url: 'https://attacker.example', baseUrl: 'https://attacker.example', headers: {}, method: 'GET', request: {}, owner: 'other', repo: 'other'}, 'owner', 'repo')
             expect(request).toEqual({owner: 'owner', repo: 'repo', version: 0})
         })
+    })
+})
+
+describe('dependency snapshot transient HTTP retry (issue #656)', () => {
+    it('retries HTTP 503 twice with bounded backoff and succeeds', async () => {
+        let attempts = 0
+        const delays: number[] = []
+        const submit = async () => {
+            attempts += 1
+            if (attempts < 3) throw Object.assign(new Error('Service Unavailable'), {status: 503})
+            return 'accepted'
+        }
+        const result = await retryTransientSubmission(submit, async ms => {
+            delays.push(ms)
+        })
+        expect(result).toBe('accepted')
+        expect(attempts).toBe(3)
+        expect(delays).toEqual([1000, 2000])
+    })
+
+    it('preserves terminal failure after the two allowed retries', async () => {
+        let attempts = 0
+        const delays: number[] = []
+        const failure = Object.assign(new Error('Bad Gateway'), {status: 502})
+        const submit = async () => {
+            attempts += 1
+            throw failure
+        }
+        await expect(
+            retryTransientSubmission(submit, async ms => {
+                delays.push(ms)
+            })
+        ).rejects.toBe(failure)
+        expect(attempts).toBe(3)
+        expect(delays).toEqual([1000, 2000])
+    })
+
+    it('does not retry non-transient HTTP 403 or 422', async () => {
+        for (const status of [403, 422]) {
+            let attempts = 0
+            const failure = Object.assign(new Error('Not retryable'), {status})
+            await expect(
+                retryTransientSubmission(
+                    async () => {
+                        attempts += 1
+                        throw failure
+                    },
+                    async () => {
+                        throw new Error('Unexpected retry wait')
+                    }
+                )
+            ).rejects.toBe(failure)
+            expect(attempts).toBe(1)
+        }
+    })
+
+    it('does not retry an error with no HTTP status', async () => {
+        let attempts = 0
+        const failure = new Error('Unknown network outcome')
+        await expect(
+            retryTransientSubmission(
+                async () => {
+                    attempts += 1
+                    throw failure
+                },
+                async () => {
+                    throw new Error('Unexpected retry wait')
+                }
+            )
+        ).rejects.toBe(failure)
+        expect(attempts).toBe(1)
+    })
+
+    it('immediately returns on success without delay', async () => {
+        const result = await retryTransientSubmission(async () => 'accepted', async () => {
+            throw new Error('Unexpected retry wait')
+        })
+        expect(result).toBe('accepted')
     })
 })
