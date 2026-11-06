@@ -115,7 +115,7 @@ export function restoreInfoLogLevel(): void {
     }
 
     const propertiesFile = state.propertiesFile
-    let stat: fs.Stats
+    let stat: ReturnType<typeof fs.lstatSync>
     try {
         stat = fs.lstatSync(propertiesFile)
     } catch (error) {

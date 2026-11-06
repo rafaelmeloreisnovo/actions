@@ -78,6 +78,26 @@ describe('post-action debug properties cleanup (issue #549)', () => {
         expect(fs.readFileSync(file, 'utf8')).toBe('original=true\nbuild-added=true\n')
     })
 
+    it('keeps properties written after creating a temporary debug file', () => {
+        const gradleHome = `${testTmp}/post-created-extended`
+        fs.mkdirSync(gradleHome, {recursive: true})
+        const file = path.resolve(gradleHome, 'gradle.properties')
+        configureInfoLogLevel(gradleHome)
+        fs.appendFileSync(file, 'added-after-setup=true\n')
+        restoreAfterSetup(gradleHome, false)
+        expect(fs.readFileSync(file, 'utf8')).toBe('added-after-setup=true\n')
+    })
+
+    it('does not recreate a temporary file already removed during the job', () => {
+        const gradleHome = `${testTmp}/post-removed`
+        fs.mkdirSync(gradleHome, {recursive: true})
+        const file = path.resolve(gradleHome, 'gradle.properties')
+        configureInfoLogLevel(gradleHome)
+        fs.unlinkSync(file)
+        restoreAfterSetup(gradleHome, false)
+        expect(fs.existsSync(file)).toBe(false)
+    })
+
     it('preserves an independently rewritten file when the injected prefix is absent', () => {
         const gradleHome = `${testTmp}/post-rewritten`
         fs.mkdirSync(gradleHome, {recursive: true})
