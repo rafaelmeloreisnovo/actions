@@ -1,0 +1,313 @@
+{
+  "schema": "rafaelia.actions.license-scopes/v1",
+  "repository": "rafaelmeloreisnovo/actions",
+  "upstream": "gradle/actions",
+  "observed_main_sha": "2138f9c78df588a577e560c7ae3dfdb89c5a1be9",
+  "scope": "SELECTED_ROOTS_AND_EIGHT_EXACT_BLOB_FIXTURES_NOT_COMPLETE_CORPUS_CLEARANCE",
+  "protected_root_license_blob": "b0c1c5227c57a4ffa546d29eece43e55e21db513",
+  "root_license": "LICENSE",
+  "authored_code_grant_state": "TOKEN_VAZIO_UNSELECTED_HOLDER_REVIEW",
+  "upstream_notice_preserved": true,
+  "legal_clearance_verified": false,
+  "exclusive_authorship_proven": false,
+  "physical_arm_execution_proven": false,
+  "actions_service_freestanding": false,
+  "whole_repo_authorial": false,
+  "new_license_grant_issued": false,
+  "release_allowed": false,
+  "claim_allowed": false,
+  "categories": [
+    "INHERITED",
+    "BUNDLED",
+    "MIXED",
+    "LOCAL_CANDIDATE",
+    "LOCAL_REUSE_HOLD",
+    "META_ONLY"
+  ],
+  "paths": [
+    {
+      "id": "upstream-root-license",
+      "path": "LICENSE",
+      "category": "INHERITED",
+      "license_route": "LICENSE",
+      "reason": "Original Gradle Inc. MIT notice; not a second new license.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "upstream-action",
+      "path": "action.yml",
+      "category": "INHERITED",
+      "license_route": "LICENSE",
+      "reason": "Root upstream composite action, not an authorial executor.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "upstream-setup",
+      "path": "setup-gradle/",
+      "category": "INHERITED",
+      "license_route": "LICENSE",
+      "reason": "Gradle upstream component; transitive audit still needed.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "upstream-dependency",
+      "path": "dependency-submission/",
+      "category": "INHERITED",
+      "license_route": "LICENSE",
+      "reason": "Gradle upstream component; per-file obligations still apply.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "upstream-wrapper",
+      "path": "wrapper-validation/",
+      "category": "INHERITED",
+      "license_route": "LICENSE",
+      "reason": "Gradle upstream component; per-file obligations still apply.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "bundled-dist",
+      "path": "dist/",
+      "category": "BUNDLED",
+      "license_route": "LICENSES/MIXED_AND_BUNDLED_HOLD.md",
+      "reason": "Generated distribution: third-party notice census pending.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "bundled-sources",
+      "path": "sources/",
+      "category": "BUNDLED",
+      "license_route": "LICENSES/MIXED_AND_BUNDLED_HOLD.md",
+      "reason": "Bundled source may include third-party dependencies.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "mixed-workflows",
+      "path": ".github/",
+      "category": "MIXED",
+      "license_route": "LICENSES/MIXED_AND_BUNDLED_HOLD.md",
+      "reason": "Workflow source mixed; GitHub Actions hosting is external.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "mixed-android",
+      "path": "android/",
+      "category": "MIXED",
+      "license_route": "LICENSES/MIXED_AND_BUNDLED_HOLD.md",
+      "reason": "Android adapters may reuse local code and call external frameworks.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-android-atlas-reuse",
+      "path": "android/atlas_wizard/native/atlas.c",
+      "category": "LOCAL_REUSE_HOLD",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Identical Git blob to freestanding/atlas_drive_l0/atlas.c; not independently created.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-kernel4",
+      "path": "freestanding/kernel4/",
+      "category": "LOCAL_CANDIDATE",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Independent L0 source at PR #3, holder/license attestation pending.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-rights-core",
+      "path": "freestanding/provenance_core/",
+      "category": "LOCAL_CANDIDATE",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Independent local C decision kernel, no Gradle implementation copied as template.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-entry-l0",
+      "path": "freestanding/entry_l0/",
+      "category": "LOCAL_CANDIDATE",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Local entry core with separate ABI; physical execution unverified.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-atlas-l0",
+      "path": "freestanding/atlas_drive_l0/",
+      "category": "LOCAL_CANDIDATE",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Local C source reused in Android adapter; one source identity.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-dispatch",
+      "path": "freestanding/dispatch_l0/",
+      "category": "LOCAL_CANDIDATE",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Proposed separate dispatch L0 contract.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-omega-os",
+      "path": "freestanding/omega_os/",
+      "category": "LOCAL_CANDIDATE",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Local freestanding experiments, not the hosted Actions runner.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-apk-bridge",
+      "path": "freestanding/apk_bridge/",
+      "category": "LOCAL_CANDIDATE",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Local bounded module; not an Android APK toolchain.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-omega-bridge",
+      "path": "freestanding/omega_bridge/",
+      "category": "LOCAL_CANDIDATE",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Local bridge candidate, not upstream Gradle source.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-rafcode",
+      "path": "rafcode/l0/",
+      "category": "LOCAL_CANDIDATE",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Local low-level code candidate, pending file-level audit.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-composition",
+      "path": "composition/",
+      "category": "LOCAL_CANDIDATE",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Local composition contracts candidate.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-provenance",
+      "path": "provenance/",
+      "category": "META_ONLY",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Catalog/validators are not proofs of legal title.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "local-pointer",
+      "path": "001_PONTEIRO/",
+      "category": "META_ONLY",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Pointers only, not executable rights grants.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    },
+    {
+      "id": "license-matrix",
+      "path": "LICENSES/",
+      "category": "META_ONLY",
+      "license_route": "LICENSES/RAFAELIA_LOCAL_RIGHTS_HOLD.md",
+      "reason": "Licensing navigation itself creates no license grant.",
+      "license_grant_issued": false,
+      "holder_verified": false,
+      "claim_allowed": false
+    }
+  ],
+  "examples": [
+    {
+      "path": "LICENSE",
+      "module": "upstream-root-license",
+      "blob": "b0c1c5227c57a4ffa546d29eece43e55e21db513"
+    },
+    {
+      "path": "action.yml",
+      "module": "upstream-action",
+      "blob": "3bae674d592f2fa4fe494e0df0478d446585133c"
+    },
+    {
+      "path": "setup-gradle/action.yml",
+      "module": "upstream-setup",
+      "blob": "78e08a6d28774c511a5c996eb8163b6928f335a0"
+    },
+    {
+      "path": "freestanding/kernel4/kernel4.c",
+      "module": "local-kernel4",
+      "blob": "f8507a9013773013674ff865cf8a205520498c41"
+    },
+    {
+      "path": "freestanding/entry_l0/entry.c",
+      "module": "local-entry-l0",
+      "blob": "c8c78a43dba3c9d45d9944a683267c871ba6bf06"
+    },
+    {
+      "path": "freestanding/provenance_core/rights_core.c",
+      "module": "local-rights-core",
+      "blob": "630ff640cfd2ee4c459c11992b83da8d582d8466"
+    },
+    {
+      "path": "freestanding/atlas_drive_l0/atlas.c",
+      "module": "local-atlas-l0",
+      "blob": "44e6e79d144cace3c48854535066f414f7699a8c"
+    },
+    {
+      "path": "android/atlas_wizard/native/atlas.c",
+      "module": "local-android-atlas-reuse",
+      "blob": "44e6e79d144cace3c48854535066f414f7699a8c",
+      "same_blob_as": "freestanding/atlas_drive_l0/atlas.c"
+    }
+  ],
+  "unresolved": [
+    "holder_attestation",
+    "legal_originality",
+    "prior_grants_and_terms",
+    "complete_fork_point",
+    "dist_component_license_census",
+    "complete_repo_file_census",
+    "physical_abi_execution"
+  ],
+  "rollback": "Close draft PR without merge. Preserve existing LICENSE and upstream history.",
+  "next": "Human rightsholder selects exact separate license text and scope; then successor manifest with per-file gate and review."
+}
