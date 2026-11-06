@@ -18,7 +18,7 @@ import {
     getWorkspaceDirectory
 } from './configuration'
 import * as wrapperValidator from './wrapper-validation/wrapper-validator'
-import {initializeGradleUserHome} from './gradle-user-home'
+import {initializeGradleUserHome, restoreInfoLogLevel} from './gradle-user-home'
 import {reportSupportStatus} from './gradle-support-status'
 
 const GRADLE_SETUP_VAR = 'GRADLE_BUILD_ACTION_SETUP_COMPLETED'
@@ -74,6 +74,13 @@ export async function complete(
         return false
     }
     core.info('In post-action step')
+
+    // Clean up even if a subsequent cache or summary operation fails.
+    try {
+        restoreInfoLogLevel()
+    } catch (error) {
+        core.warning(`Failed to restore Gradle debug properties: ${String(error)}`)
+    }
 
     const buildResults = loadBuildResults()
 
