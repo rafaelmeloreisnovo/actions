@@ -70,16 +70,76 @@ function registerToolchains(userHome: string): void {
  *
  * @VisibleForTesting
  */
+const DEBUG_LOGGING_PROPERTIES = `org.gradle.logging.level=info\norg.gradle.logging.stacktrace=all\n`
+const DEBUG_LOGGING_STATE = 'GRADLE_DEBUG_PROPERTIES'
+
 export function configureInfoLogLevel(gradleUserHome: string): void {
-    const infoProperties = `org.gradle.logging.level=info\norg.gradle.logging.stacktrace=all\n`
     const propertiesFile = path.resolve(gradleUserHome, 'gradle.properties')
-    if (fs.existsSync(propertiesFile)) {
+    const existedBefore = fs.existsSync(propertiesFile)
+    if (existedBefore) {
         core.info(`Merged --info and --stacktrace into existing ${propertiesFile} file`)
         const existingProperties = fs.readFileSync(propertiesFile, 'utf-8')
-        fs.writeFileSync(propertiesFile, `${infoProperties}\n${existingProperties}`)
+        fs.writeFileSync(propertiesFile, `${DEBUG_LOGGING_PROPERTIES}\n${existingProperties}`)
     } else {
         core.info(`Created a new ${propertiesFile} with --info and --stacktrace`)
-        fs.writeFileSync(propertiesFile, infoProperties)
+        fs.writeFileSync(propertiesFile, DEBUG_LOGGING_PROPERTIES)
+    }
+    // The post action is a separate process: save only the path and creation mode, never file contents.
+    core.saveState(DEBUG_LOGGING_STATE, JSON.stringify({propertiesFile, existedBefore}))
+}
+
+/**
+ * Undo only the lines this action prepended for runner debug mode.
+ * Preserve pre-existing and subsequently added user properties, even on persistent runners.
+ * This is called before cache save so temporary debug options cannot be cached.
+ */
+export function restoreInfoLogLevel(): void {
+    const savedState = core.getState(DEBUG_LOGGING_STATE)
+    if (!savedState) return
+
+    let state: {propertiesFile?: unknown; existedBefore?: unknown}
+    try {
+        state = JSON.parse(savedState)
+    } catch {
+        core.warning('Cannot restore Gradle debug properties: invalid saved state.')
+        return
+    }
+    if (
+        !state ||
+        typeof state.propertiesFile !== 'string' ||
+        !path.isAbsolute(state.propertiesFile) ||
+        typeof state.existedBefore !== 'boolean'
+    ) {
+        core.warning('Cannot restore Gradle debug properties: invalid path or creation mode.')
+        return
+    }
+
+    const propertiesFile = state.propertiesFile
+    let stat: fs.Stats
+    try {
+        stat = fs.lstatSync(propertiesFile)
+    } catch (error) {
+        if ((error as NodeJS.ErrnoException).code === 'ENOENT') return
+        throw error
+    }
+    // Never delete another file reached through a changed symlink or non-regular path.
+    if (!stat.isFile() || stat.isSymbolicLink()) {
+        core.warning(`Skipping Gradle debug cleanup of non-regular file: ${propertiesFile}`)
+        return
+    }
+
+    const injectedPrefix = state.existedBefore ? `${DEBUG_LOGGING_PROPERTIES}\n` : DEBUG_LOGGING_PROPERTIES
+    const currentProperties = fs.readFileSync(propertiesFile, 'utf-8')
+    if (!currentProperties.startsWith(injectedPrefix)) {
+        core.warning(`Skipping Gradle debug cleanup: injected prefix changed in ${propertiesFile}`)
+        return
+    }
+
+    const remainingProperties = currentProperties.slice(injectedPrefix.length)
+    if (!state.existedBefore && remainingProperties === '') {
+        fs.unlinkSync(propertiesFile)
+    } else {
+        fs.writeFileSync(propertiesFile, remainingProperties)
     }
 }
 
