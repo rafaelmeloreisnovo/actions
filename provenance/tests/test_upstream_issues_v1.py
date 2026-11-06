@@ -41,6 +41,11 @@ class UpstreamRouteTests(unittest.TestCase):
         modified["issues"][1]["patch_base"] = modified["fork_main_sha"]
         self.assertTrue(MOD.validate(modified))
 
+    def test_no_fabricated_dco_signoff(self):
+        modified = copy.deepcopy(DATA)
+        modified["gate_policy"]["external_dco_attestation"] = "SIGNED"
+        self.assertTrue(MOD.validate(modified))
+
     def test_no_deadline_invention(self):
         modified = copy.deepcopy(DATA)
         modified["issues"][0]["hard_deadline"] = "2026-11-09"

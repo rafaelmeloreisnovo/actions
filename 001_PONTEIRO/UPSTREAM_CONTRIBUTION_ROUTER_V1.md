@@ -21,6 +21,8 @@
 
 No binding upstream deadlines or staff assignments were observed; all dates are internal **proposed checkpoints**, not promises or observed external SLAs.
 
+DCO evidence: [upstream .github/dco.yml](https://github.com/gradle/actions/blob/c8a326d85724fce2ae59a38810306f4a058f26a4/.github/dco.yml) disables DCO checking for Gradle organization members. No verified contributor sign-off is present on these candidate commits: `DCO_ATTESTATION=TOKEN_VAZIO`. A reviewer must check applicability and the rightsholder must authorize the exact statement; never fabricate `Signed-off-by` text.
+
 ## Pipeline/checkpoints
 `INTAKE → SOURCE_AUTHORITY → REPRO → NARROW_PATCH → ADVERSARIAL_TEST → CI → MAINTAINER_REVIEW → UPSTREAM_MERGE → RECEIPT`.
 

@@ -26,6 +26,8 @@ def validate(doc):
             errors.append("unverified promotion: " + key)
     if gate.get("upstream_submission_state") != "NOT_SUBMITTED":
         errors.append("unverified upstream submission")
+    if gate.get("external_dco_attestation") != "TOKEN_VAZIO_NOT_ATTESTED":
+        errors.append("unverified DCO attestation promoted")
     if gate.get("hard_deadline") is not None:
         errors.append("fabricated binding deadline")
     issues = doc.get("issues", [])

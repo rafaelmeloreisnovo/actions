@@ -10,7 +10,8 @@
     "https://github.com/gradle/actions/blob/c8a326d85724fce2ae59a38810306f4a058f26a4/CONTRIBUTING.md",
     "https://github.com/gradle/actions/blob/c8a326d85724fce2ae59a38810306f4a058f26a4/CLAUDE.md",
     "https://github.com/gradle/actions/blob/c8a326d85724fce2ae59a38810306f4a058f26a4/DISTRIBUTION.md",
-    "https://www.alphaxiv.org/abs/2604.27148"
+    "https://www.alphaxiv.org/abs/2604.27148",
+    "https://github.com/gradle/actions/blob/c8a326d85724fce2ae59a38810306f4a058f26a4/.github/dco.yml"
   ],
   "pipeline": [
     "INTAKE",
@@ -35,7 +36,8 @@
     "allowed_merge_without_provider_pass": false,
     "proposed_checkpoint_dates_are_commitments": false,
     "hard_deadline": null,
-    "confidentiality": "No secrets/PATs, device logs, personal files or proprietary code in public forks."
+    "confidentiality": "No secrets/PATs, device logs, personal files or proprietary code in public forks.",
+    "external_dco_attestation": "TOKEN_VAZIO_NOT_ATTESTED"
   },
   "issues": [
     {
@@ -399,6 +401,6 @@
     "no_new_parallel_scheduler": true,
     "rollback": "Close draft PRs #27/#28/#29; upstream Gradle main unchanged.",
     "readback_expected": "Compare patch heads to c8a326d85724fce2ae59a38810306f4a058f26a4 and attest file changes before claim promotion",
-    "next": "Run provider CI for #27 and #28, collect logs/receipts, then get maintainer feedback without conflating cache producer."
+    "next": "Provider CI exact-head + inspect and satisfy upstream DCO through authorized contributor + maintainer review; no invented signoff"
   }
 }
