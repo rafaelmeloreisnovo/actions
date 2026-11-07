@@ -20,6 +20,40 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  host-frame-falsifier:
+    name: kernel4 / exhaustive host frame and parity test
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout exact source head
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+          fetch-depth: 1
+          persist-credentials: false
+          sparse-checkout: |
+            freestanding/kernel4
+          sparse-checkout-cone-mode: true
+
+      - name: Exhaustively check all 256 frames with sanitizers
+        shell: bash
+        env:
+          EXPECTED_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "$EXPECTED_SOURCE_SHA"
+          clang -std=c11 -O1 -g \
+            -fsanitize=address,undefined -fno-omit-frame-pointer \
+            -Wall -Wextra -Werror \
+            freestanding/kernel4/tests/test_frames_host.c \
+            -o /tmp/kernel4_test_frames_host
+          ASAN_OPTIONS=detect_leaks=1:halt_on_error=1 \
+            UBSAN_OPTIONS=halt_on_error=1 /tmp/kernel4_test_frames_host
+          echo "source_sha=$EXPECTED_SOURCE_SHA" >> "$GITHUB_STEP_SUMMARY"
+          echo 'scope=HOST_256_FRAMES_NO_ELF_BOOT_NO_HARDWARE' >> "$GITHUB_STEP_SUMMARY"
+
   freestanding:
     name: kernel4 / ${{ matrix.name }}
     runs-on: ubuntu-24.04
