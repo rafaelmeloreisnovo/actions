@@ -9,7 +9,7 @@ int main(void){
  o_context c,prev; o_receipt r; o_event e;
  unsigned seed=0x20261013u,i,j,active,st;
  omega_init(&c,1234u);
- e=(o_event){1u,O_BOOT,O_ROOT,O_NONE,0u};
+ e=(o_event){1u,O_BOOT,O_ROOT,O_NONE,0u,0u};
  if(omega_step(&c,&e,&r)!=O_OK)return 1;
  for(i=0;i<30000u;i++){
   prev=c;
