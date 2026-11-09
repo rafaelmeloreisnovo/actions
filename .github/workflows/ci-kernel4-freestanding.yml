@@ -37,6 +37,10 @@ jobs:
             freestanding/kernel4
           sparse-checkout-cone-mode: true
 
+      - name: Reject unsafe output paths before recursive removal
+        shell: bash
+        run: bash freestanding/kernel4/tests/test_out_guard.sh
+
       - name: Exhaustively check all 256 frames with sanitizers
         shell: bash
         env:

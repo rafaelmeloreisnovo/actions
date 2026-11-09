@@ -25,6 +25,21 @@ fail() {
     exit 1
 }
 
+
+# Hosted gate guard: output is later recursively deleted. Strict allowlist first.
+# This is a CI/shell boundary and cannot make GitHub Actions freestanding.
+case "$OUT" in
+    out/kernel4/*) ;;
+    *) fail "unsafe output path (outside out/kernel4): $OUT" ;;
+esac
+OUT_LEAF=${OUT#out/kernel4/}
+case "$OUT_LEAF" in
+    ''|*[!A-Za-z0-9_-]*) fail "unsafe output path (invalid component): $OUT" ;;
+esac
+if [[ -L out || -L out/kernel4 || -L "$OUT" ]]; then
+    fail "unsafe output path (symlink): $OUT"
+fi
+
 resolve_tool() {
     local candidate
     for candidate in "$@"; do
