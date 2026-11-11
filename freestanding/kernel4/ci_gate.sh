@@ -40,6 +40,9 @@ if [[ -L out || -L out/kernel4 || -L "$OUT" ]]; then
     fail "unsafe output path (symlink): $OUT"
 fi
 
+# Fail before any tool resolution or shell arithmetic: only a bounded decimal budget.
+[[ "$MAX_ALLOC_BYTES" =~ ^[1-9][0-9]{0,8}$ ]] || fail 'invalid allocation budget (decimal 1..999999999)'
+
 resolve_tool() {
     local candidate
     for candidate in "$@"; do
